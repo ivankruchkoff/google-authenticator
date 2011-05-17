@@ -1,4 +1,4 @@
-=== google-authenticator ===
+=== Google Authenticator ===
 Contributors: Henrik.Schack
 Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=CA36JVKMLE9EA&lc=DK&item_number=Google%20Authenticator&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted
 Tags: authentication,otp,password,security,login,android,iphone,blackberry
