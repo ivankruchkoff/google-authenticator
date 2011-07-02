@@ -2,17 +2,18 @@
 /*
 Plugin Name: Google Authenticator
 Plugin URI: http://henrik.schack.dk/google-authenticator-for-wordpress
-Description: Multi-Factor Authentication for Wordpress using the Android/Iphone/Blackberry app as One Time Password generator.
+Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Henrik Schack
-Version: 0.20
+Version: 0.30
 Author URI: http://henrik.schack.dk/
-Compatibility : WordPress 3.1.2
-Text Domain: google-auth
+Compatibility: WordPress 3.2-RC2
+Text Domain: google-authenticator
 Domain Path: /lang
 
 ----------------------------------------------------------------------------
 
-	Thanks to Bryan Ruiz for his Base32 encode/decode class, found at php.net
+	Thanks to Bryan Ruiz for his Base32 encode/decode class, found at php.net.
+	Thanks to Tobias Bäthge for his major code rewrite and German translation.
 	
 ----------------------------------------------------------------------------
 
@@ -33,15 +34,44 @@ Domain Path: /lang
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-require_once('base32.php');
+class GoogleAuthenticator {
 
+static $instance; // to store a reference to the plugin, allows other plugins to remove actions
+
+/**
+ * Constructor, entry point of the plugin
+ */
+function __construct() {
+    self::$instance = $this;
+    add_action( 'init', array( $this, 'init' ) );
+}
+
+/**
+ * Initialization, Hooks, and localization
+ */
+function init() {
+    require_once( 'base32.php' );
+    
+    add_action( 'login_form', array( $this, 'loginform' ) );
+    add_filter( 'wp_authenticate_user', array( $this, 'check_otp' ) );
+
+    if ( defined( 'DOING_AJAX' ) && DOING_AJAX )
+        add_action( 'wp_ajax_GoogleAuthenticator_action', array( $this, 'ajax_callback' ) );
+
+    add_action( 'personal_options_update', array( $this, 'personal_options_update' ) );
+    add_action( 'profile_personal_options', array( $this, 'profile_personal_options' ) );
+    add_action( 'edit_user_profile', array( $this, 'edit_user_profile' ) );
+    add_action( 'edit_user_profile_update', array( $this, 'edit_user_profile_update' ) );
+
+    load_plugin_textdomain( 'google-authenticator', false, basename( dirname( __FILE__ ) ) . '/lang' );
+}
 
 /**
  * Check the verification code entered by the user.
  */
-function GoogleAuthenticate($secretkey,$thistry) {
+function verify( $secretkey, $thistry ) {
 	
-	$tm=intval(time()/30);
+	$tm = floor( time() / 30 );
 	
 	$secretkey=Base32::decode($secretkey);
 	// Keys from 30 seconds before and after are valid aswell.
@@ -49,7 +79,7 @@ function GoogleAuthenticate($secretkey,$thistry) {
 		// Pack time into binary string
 		$time=chr(0).chr(0).chr(0).chr(0).pack('N*',$tm+$i);
 		// Hash it with users secret key
-		$hm=hash_hmac ('SHA1' ,$time, $secretkey,true);
+		$hm = hash_hmac( 'SHA1', $time, $secretkey, true );
 		// Use last nipple of result as index/offset
 		$offset = ord(substr($hm,-1)) & 0x0F;
 		// grab 4 bytes of the result
@@ -59,36 +89,37 @@ function GoogleAuthenticate($secretkey,$thistry) {
 		$value=$value[1];
 		// Only 32 bits
 		$value = $value & 0x7FFFFFFF;
-		$value = bcmod($value,1000000) ;
-		if ($value == $thistry) {
+		$value = $value % 1000000;
+		if ( $value == $thistry ) {
 			return true;
-		}
+		}	
 	}
 	return false;
 }
 
 /**
- * Create a new secret for the Google Authenticator app.
- * Hash the current time, with the hash of the users password
- * then grap 10 bytes of the result using lower nipple as offset
- * into the datastring.
+ * Create a new random secret for the Google Authenticator app.
+ * 16 characters, randomly chosen from the allowed Base32 characters
+ * equals 10 bytes = 80 bits, as 256^10 = 32^16 = 2^80
  */ 
-function GoogleAuthenticator_create_secret($inputvalue) {
-	$rawsecret = hash_hmac('SHA256',microtime(),$inputvalue,true);
-	$offset = ord(substr($rawsecret,-1)) & 0x0F;
-	$secret = substr($rawsecret,$offset,10);
-	return Base32::encode($secret);
+function create_secret() {
+    $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'; // allowed characters in Base32
+    $secret = '';
+    for ( $i = 0; $i < 16; $i++ ) {
+        $secret .= substr( $chars, wp_rand( 0, strlen( $chars ) - 1 ), 1 );
+    }
+    return $secret;
 }
 
 
 /**
  * Add verification code field to login form.
  */
-function GoogleAuthenticator_loginform() {
-  echo "\t<p>\n";
-  echo "\t\t<label><a href=\"http://code.google.com/p/google-authenticator/\" target=\"_blank\" title=\"".__('If You don\'t have Google Authenticator enabled for Your Wordpress account, leave this field empty.','google-auth')."\">".__('Google Authenticator code','google-auth')."</a><span id=\"google-auth-info\"></span><br />\n";
-  echo "\t\t<input type=\"password\" name=\"otp\" id=\"user_email\" class=\"input\" value=\"\" size=\"20\" tabindex=\"25\" /></label>\n";
-  echo "\t</p>\n";
+function loginform() {
+    echo "\t<p>\n";
+    echo "\t\t<label><a href=\"http://code.google.com/p/google-authenticator/\" target=\"_blank\" title=\"".__('If you don\'t have Google Authenticator enabled for your WordPress account, leave this field empty.','google-authenticator')."\">".__('Google Authenticator code','google-authenticator')."</a><span id=\"google-auth-info\"></span><br />\n";
+    echo "\t\t<input type=\"password\" name=\"otp\" id=\"user_email\" class=\"input\" value=\"\" size=\"20\" tabindex=\"25\" /></label>\n";
+    echo "\t</p>\n";
 }
 
 
@@ -98,7 +129,7 @@ function GoogleAuthenticator_loginform() {
  * @param wordpressuser
  * @return user/loginstatus
  */
-function GoogleAuthenticator_check_otp( $user ) {
+function check_otp( $user ) {
 
 	// Does the user have the Google Authenticator enabled ?
 	if ( trim(get_user_option('googleauthenticator_enabled',$user->ID)) == 'enabled' ) {
@@ -110,9 +141,8 @@ function GoogleAuthenticator_check_otp( $user ) {
 		$otp = intval( trim( $_POST[ 'otp' ] ) );
 		
 		// Valid code ?
-		if (! GoogleAuthenticate( $GA_secret, $otp ) ) { 
-			return false;
-		}
+		if ( ! $this->verify( $GA_secret, $otp ) )
+			return new WP_Error( 'invalid_google_authenticator_token', __( '<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired.', 'google-authenticator' ) );
 	}	
 	return $user;
 }
@@ -121,7 +151,7 @@ function GoogleAuthenticator_check_otp( $user ) {
 /**
  * Extend personal profile page with Google Authenticator settings.
  */
-function GoogleAuthenticator_profile_personal_options() {
+function profile_personal_options() {
 	global $user_id, $is_profile_page;
 	
 	$GA_secret			=trim( get_user_option( 'googleauthenticator_secret', $user_id ) );
@@ -129,57 +159,48 @@ function GoogleAuthenticator_profile_personal_options() {
 	$GA_description		=trim( get_user_option( 'googleauthenticator_description', $user_id ) );
 
 	// In case the user has no secret ready (new install), we create one.
-	if ($GA_secret == "") {
-		$GA_secret=GoogleAuthenticator_create_secret( get_user_option( 'user_pass', $user_id ) );
-	}
+	if ( '' == $GA_secret )
+		$GA_secret = $this->create_secret();
 
-	// Use "Wordpress blog" as default description
-	if ($GA_description == "") {
-		$GA_description=__("Wordpress blog",'google-auth');
-	}
+	// Use "WordPress Blog" as default description
+	if ( '' == $GA_description )
+		$GA_description = __( 'WordPress Blog', 'google-authenticator' );
 
-	echo "<h3>".__( 'Google Authenticator settings', 'google-auth' )."</h3>\n";
+	echo "<h3>".__( 'Google Authenticator Settings', 'google-authenticator' )."</h3>\n";
 
 	echo "<table class=\"form-table\">\n";
 	echo "<tbody>\n";
 	echo "<tr>\n";
-	echo "<th scope=\"row\">".__( 'Active', 'google-auth' )."</th>\n";
+	echo "<th scope=\"row\">".__( 'Active', 'google-authenticator' )."</th>\n";
 	echo "<td>\n";
-
-	echo "<div><input name=\"GA_enabled\" id=\"GA_enabled\" class=\"tog\" type=\"checkbox\"";
-	if ( $GA_enabled == 'enabled' ) {
-		echo ' checked="checked"';
-	}
-	echo "/>";
-	echo "</div>\n";
-
+	echo "<div><input name=\"GA_enabled\" id=\"GA_enabled\" class=\"tog\" type=\"checkbox\"" . checked( $GA_enabled, 'enabled', false ) . "/></div>\n";
 	echo "</td>\n";
 	echo "</tr>\n";
 
 	// Create URL for the Google charts QR code generator.
-	$chl=urlencode("otpauth://totp/".$GA_description."?secret=".$GA_secret);
-	$qrcodeurl="http://chart.apis.google.com/chart?cht=qr&amp;chs=300x300&amp;chld=H|0&amp;chl=".$chl;
+	$chl = urlencode( "otpauth://totp/{$GA_description}?secret={$GA_secret}" );
+	$qrcodeurl = "https://chart.googleapis.com/chart?cht=qr&amp;chs=300x300&amp;chld=H|0&amp;chl={$chl}";
 
 	if ( $is_profile_page || IS_PROFILE_PAGE ) {
 		echo "<tr>\n";
-		echo "<th><label for=\"GA_description\">".__('Description','google-auth')."</label></th>\n";
-		echo "<td><input name=\"GA_description\" id=\"GA_description\" value=\"".$GA_description."\"  type=\"text\" /><span class=\"description\">".__(' Description you\'ll see on your phone.','google-auth')."</span><br /></td>\n";
+		echo "<th><label for=\"GA_description\">".__('Description','google-authenticator')."</label></th>\n";
+		echo "<td><input name=\"GA_description\" id=\"GA_description\" value=\"{$GA_description}\"  type=\"text\" /><span class=\"description\">".__(' Description that you\'ll see in the Google Authenticator app on your phone.','google-authenticator')."</span><br /></td>\n";
 		echo "</tr>\n";
 
 		echo "<tr>\n";
-		echo "<th><label for=\"GA_secret\">".__('Secret','google-auth')."</label></th>\n";
+		echo "<th><label for=\"GA_secret\">".__('Secret','google-authenticator')."</label></th>\n";
 		echo "<td>\n";
-		echo "<input name=\"GA_secret\" id=\"GA_secret\" value=\"".$GA_secret."\" readonly=\"true\"  type=\"text\"  />";
-		echo "<input name=\"GA_newsecret\" id=\"GA_newsecret\" value=\"".__("Create new secret",'google-auth')."\"   type=\"button\" class=\"button\" />";
-		echo "<input name=\"show_qr\" id=\"show_qr\" value=\"".__("Show/Hide QR code",'google-auth')."\"   type=\"button\" class=\"button\" onclick=\"jQuery('#GA_QR_INFO').toggle('slow');\" />";
+		echo "<input name=\"GA_secret\" id=\"GA_secret\" value=\"{$GA_secret}\" readonly=\"true\"  type=\"text\"  />";
+		echo "<input name=\"GA_newsecret\" id=\"GA_newsecret\" value=\"".__("Create new secret",'google-authenticator')."\"   type=\"button\" class=\"button\" />";
+		echo "<input name=\"show_qr\" id=\"show_qr\" value=\"".__("Show/Hide QR code",'google-authenticator')."\"   type=\"button\" class=\"button\" onclick=\"jQuery('#GA_QR_INFO').toggle('slow');\" />";
 		echo "</td>\n";
 		echo "</tr>\n";
 
 		echo "<tr>\n";
 		echo "<th></th>\n";
 		echo "<td><div id=\"GA_QR_INFO\" style=\"display: none\" >";
-		echo "<img id=\"GA_QRCODE\"  src=\"".$qrcodeurl."\" alt=\"QR Code\"/>";
-		echo "<span class=\"description\">".__('<br/>  Scan this with the Google Authenticator app.','google-auth')."</span>";
+		echo "<img id=\"GA_QRCODE\"  src=\"{$qrcodeurl}\" alt=\"QR Code\"/>";
+		echo '<span class="description"><br/> ' . __( 'Scan this with the Google Authenticator app.', 'google-authenticator' ) . '</span>';
 		echo "</div></td>\n";
 		echo "</tr>\n";
 
@@ -188,7 +209,6 @@ function GoogleAuthenticator_profile_personal_options() {
 
 	echo "</tbody></table>\n";
 	echo "<script type=\"text/javascript\">\n";
-	echo "var ajaxurl='".admin_url( 'admin-ajax.php' )."'\n";
 	echo "var GAnonce='".wp_create_nonce('GoogleAuthenticatoraction')."';\n";
   	echo <<<ENDOFJS
 	jQuery('#GA_newsecret').bind('click', function() {
@@ -198,7 +218,7 @@ function GoogleAuthenticator_profile_personal_options() {
 		jQuery.post(ajaxurl, data, function(response) {
   			jQuery('#GA_secret').val(response['new-secret']);
   			chl=escape("otpauth://totp/"+jQuery('#GA_description').val()+"?secret="+jQuery('#GA_secret').val());
-  			qrcodeurl="http://chart.apis.google.com/chart?cht=qr&chs=300x300&chld=H|0&chl="+chl;
+  			qrcodeurl="https://chart.googleapis.com/chart?cht=qr&chs=300x300&chld=H|0&chl="+chl;
   			jQuery('#GA_QRCODE').attr('src',qrcodeurl);
   			jQuery('#GA_QR_INFO').show('slow');
   		});  	
@@ -206,7 +226,7 @@ function GoogleAuthenticator_profile_personal_options() {
 	
 	jQuery('#GA_description').bind('focus blur change keyup', function() {
   		chl=escape("otpauth://totp/"+jQuery('#GA_description').val()+"?secret="+jQuery('#GA_secret').val());
-  		qrcodeurl="http://chart.apis.google.com/chart?cht=qr&chs=300x300&chld=H|0&chl="+chl;
+  		qrcodeurl="https://chart.googleapis.com/chart?cht=qr&chs=300x300&chld=H|0&chl="+chl;
   		jQuery('#GA_QRCODE').attr('src',qrcodeurl);
 	});
 	
@@ -218,43 +238,37 @@ ENDOFJS;
 /**
  * Form handling of Google Authenticator options added to personal profile page (user editing his own profile)
  */
-function GoogleAuthenticator_personal_options_update() {
+function personal_options_update() {
 	global $user_id;
 
 	$GA_enabled		= trim( $_POST['GA_enabled'] );
 	$GA_secret		= trim( $_POST['GA_secret'] );
 	$GA_description	= trim( $_POST['GA_description'] );
 	
-	if ($GA_enabled !="") {
-		$GA_enabled="enabled";
-	} else {
-		$GA_enabled="disabled";
-	}
+	if ( '' == $GA_enabled )
+		$GA_enabled = 'disabled';
+    else
+		$GA_enabled = 'enabled';
 	
 	update_user_option( $user_id, 'googleauthenticator_enabled', $GA_enabled, true );
 	update_user_option( $user_id, 'googleauthenticator_secret', $GA_secret, true );
 	update_user_option( $user_id, 'googleauthenticator_description', $GA_description, true );
-
 }
 
 /**
  * Extend profile page with ability to enable/disable Google Authenticator authentication requirement.
  * Used by an administrator when editing other users.
  */
-function GoogleAuthenticator_edit_user_profile() {
+function edit_user_profile() {
 	global $user_id;
 	$GA_enabled = trim( get_user_option( 'googleauthenticator_enabled', $user_id ) );
-	echo "<h3>".__('Google Authenticator settings','google-auth')."</h3>\n";
+	echo "<h3>".__('Google Authenticator Settings','google-authenticator')."</h3>\n";
 	echo "<table class=\"form-table\">\n";
 	echo "<tbody>\n";
 	echo "<tr>\n";
-	echo "<th scope=\"row\">".__('Active','google-auth')."</th>\n";
+	echo "<th scope=\"row\">".__('Active','google-authenticator')."</th>\n";
 	echo "<td>\n";
-	echo "<div><input name=\"GA_enabled\" id=\"GA_enabled\"  class=\"tog\" type=\"checkbox\"";
-	if ( $GA_enabled == 'enabled' ) {
-		echo ' checked ';
-	}
-	echo "/>\n";
+	echo "<div><input name=\"GA_enabled\" id=\"GA_enabled\"  class=\"tog\" type=\"checkbox\"" . checked( $GA_enabled, 'enabled', false ) . "/>\n";
 	echo "</td>\n";
 	echo "</tr>\n";
 	echo "</tbody>\n";
@@ -264,77 +278,41 @@ function GoogleAuthenticator_edit_user_profile() {
 /**
  * Form handling of Google Authenticator options on edit profile page (admin user editing other user)
  */
-function GoogleAuthenticator_edit_user_profile_update() {
+function edit_user_profile_update() {
 	global $user_id;
 	
 	$GA_enabled	= trim( $_POST['GA_enabled'] );
-	if ( $GA_enabled != '' ) {
-		update_user_option( $user_id, 'googleauthenticator_enabled', 'enabled', true );
-	} else {
-		update_user_option( $user_id, 'googleauthenticator_enabled', 'disabled', true );	
-	}
+
+	if ( '' == $GA_enabled )
+		$GA_enabled = 'disabled';
+    else
+		$GA_enabled = 'enabled';
+
+	update_user_option( $user_id, 'googleauthenticator_enabled', $GA_enabled, true );
 }
 
 
 /**
 * AJAX callback function used to generate new secret
 */
-function GoogleAuthenticator_callback() {
+function ajax_callback() {
 	global $user_id;
 
 	// Some AJAX security
-	check_ajax_referer('GoogleAuthenticatoraction', 'nonce');
+	check_ajax_referer( 'GoogleAuthenticatoraction', 'nonce' );
 	
 	// Create new secret, using the users password hash as input for further hashing
-	$secret=GoogleAuthenticator_create_secret( get_user_option( 'user_pass', $user_id ) );
+	$secret = $this->create_secret();
 
-	$result=array('new-secret'=>$secret);	
-	header( "Content-Type: application/json" );
+	$result = array( 'new-secret' => $secret );
+	header( 'Content-Type: application/json' );
 	echo json_encode( $result );
 
 	// die() is required to return a proper result
 	die(); 
 }
 
+} // end class
 
-/**
-* Does the PHP installation have what it takes to use this plugin ? 
-*/
-function GoogleAuthenticator_check_requirements() {
-
-	// is the SHA-1 hashing available ?
-	$GoogleAuthenticatorAlgos = hash_algos();
-	if ( ! in_array( "sha1", $GoogleAuthenticatorAlgos ) ) {
-		return false;
-	}	
-	// is the SHA-256 hashing available ?
-	$GoogleAuthenticatorAlgos = hash_algos();
-	if ( ! in_array( "sha256", $GoogleAuthenticatorAlgos ) ) {
-		return false;
-	}		
-	return true;
-}
-
-/**
-* Prevent activation of the plugin if the PHP installation doesn't meet the requirements.
-*/
-function GoogleAuthenticator_activate() {
-	if ( ! GoogleAuthenticator_check_requirements()) {
-		die( __('Google Authenticator: Something is missing, this plugin requires the SHA1 & SHA256 Hashing algorithms to be present in your PHP installation.', 'google-auth') );
-	}
-}
-
-// Initialization and Hooks
-add_action('personal_options_update','GoogleAuthenticator_personal_options_update');
-add_action('profile_personal_options','GoogleAuthenticator_profile_personal_options');
-add_action('edit_user_profile','GoogleAuthenticator_edit_user_profile');
-add_action('edit_user_profile_update','GoogleAuthenticator_edit_user_profile_update');
-add_action('login_form', 'GoogleAuthenticator_loginform');	
-add_action('wp_ajax_GoogleAuthenticator_action', 'GoogleAuthenticator_callback');
-
-add_filter('wp_authenticate_user','GoogleAuthenticator_check_otp');	
-
-register_activation_hook( __FILE__, 'GoogleAuthenticator_activate' );
-
-load_plugin_textdomain('google-auth', false , dirname( plugin_basename(__FILE__)).'/lang' );
+new GoogleAuthenticator;
 ?>
