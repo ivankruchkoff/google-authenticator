@@ -4,9 +4,9 @@ Plugin Name: Google Authenticator
 Plugin URI: http://henrik.schack.dk/google-authenticator-for-wordpress
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Henrik Schack
-Version: 0.30
+Version: 0.35
 Author URI: http://henrik.schack.dk/
-Compatibility: WordPress 3.2-RC2
+Compatibility: WordPress 3.2
 Text Domain: google-authenticator
 Domain Path: /lang
 
@@ -53,7 +53,7 @@ function init() {
     require_once( 'base32.php' );
     
     add_action( 'login_form', array( $this, 'loginform' ) );
-    add_filter( 'wp_authenticate_user', array( $this, 'check_otp' ) );
+    add_filter( 'authenticate', array( $this, 'check_otp' ), 50, 3 );
 
     if ( defined( 'DOING_AJAX' ) && DOING_AJAX )
         add_action( 'wp_ajax_GoogleAuthenticator_action', array( $this, 'ajax_callback' ) );
@@ -129,22 +129,50 @@ function loginform() {
  * @param wordpressuser
  * @return user/loginstatus
  */
-function check_otp( $user ) {
+function check_otp( $user, $username = '', $password = '' ) {
+	// Store result of loginprocess, so far.
+	$userstate = $user;
+
+	// Get information on user, we need this in case an app password has been enabled,
+	// since the $user var only contain an error at this point in the login flow.
+	$user = get_userdatabylogin( $username );
 
 	// Does the user have the Google Authenticator enabled ?
-	if ( trim(get_user_option('googleauthenticator_enabled',$user->ID)) == 'enabled' ) {
+	if ( trim(get_user_option( 'googleauthenticator_enabled', $user->ID ) ) == 'enabled' ) {
 
 		// Get the users secret
 		$GA_secret = trim( get_user_option( 'googleauthenticator_secret', $user->ID ) );
 		
 		// Get the verification code entered by the user trying to login
 		$otp = intval( trim( $_POST[ 'otp' ] ) );
-		
+	
 		// Valid code ?
-		if ( ! $this->verify( $GA_secret, $otp ) )
-			return new WP_Error( 'invalid_google_authenticator_token', __( '<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired.', 'google-authenticator' ) );
-	}	
-	return $user;
+		if ( $this->verify( $GA_secret, $otp ) ) {
+			return $userstate;
+		} else {
+			// No, lets see if an app password is enabled
+			if ( trim( get_user_option( 'googleauthenticator_pwdenabled', $user->ID ) ) == 'enabled' ) {
+				$GA_passwords 	= json_decode(  get_user_option( 'googleauthenticator_passwords', $user->ID ) );
+				$passwordsha1	= trim($GA_passwords->{'password'} );
+				$usersha1		= sha1( strtoupper( str_replace( ' ', '', $password ) ) );
+				if ( $passwordsha1 == $usersha1 ) {
+					return new WP_User( $user->ID );
+				} else {
+					if ( $otp == '' ) {
+						// No Google Authenticator code entered, must be a wrong app login attempt
+						return new WP_Error( 'invalid_google_authenticator_password', __( '<strong>ERROR</strong>: The Google Authenticator password is incorrect.', 'google-authenticator' ) );
+					} else {
+						return new WP_Error( 'invalid_google_authenticator_token', __( '<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired.', 'google-authenticator' ) );
+					}			
+				} 		 
+			} else {
+				return new WP_Error( 'invalid_google_authenticator_token', __( '<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired.', 'google-authenticator' ) );
+			}	
+		}
+	}		
+	// Google Authenticator isn't enabled for this account,
+	// just resume normal authentication.
+	return $userstate;
 }
 
 
@@ -154,18 +182,28 @@ function check_otp( $user ) {
 function profile_personal_options() {
 	global $user_id, $is_profile_page;
 	
-	$GA_secret			=trim( get_user_option( 'googleauthenticator_secret', $user_id ) );
-	$GA_enabled			=trim( get_user_option( 'googleauthenticator_enabled', $user_id ) );
-	$GA_description		=trim( get_user_option( 'googleauthenticator_description', $user_id ) );
+	$GA_secret			= trim( get_user_option( 'googleauthenticator_secret', $user_id ) );
+	$GA_enabled			= trim( get_user_option( 'googleauthenticator_enabled', $user_id ) );
+	$GA_description		= trim( get_user_option( 'googleauthenticator_description', $user_id ) );
+	$GA_pwdenabled		= trim( get_user_option( 'googleauthenticator_pwdenabled', $userid ) );
+	$GA_password		= trim( get_user_option( 'googleauthenticator_passwords', $user_id ) );
+	
+	// We dont store the generated app password in cleartext so there is no point in trying
+	// to show the user anything except from the fact that a password exists.
+	if ( $GA_password != '' ) {
+		$GA_password = "XXXX XXXX XXXX XXXX";
+	}
 
 	// In case the user has no secret ready (new install), we create one.
-	if ( '' == $GA_secret )
+	if ( '' == $GA_secret ) {
 		$GA_secret = $this->create_secret();
-
+	}
+	
 	// Use "WordPress Blog" as default description
-	if ( '' == $GA_description )
+	if ( '' == $GA_description ) {
 		$GA_description = __( 'WordPress Blog', 'google-authenticator' );
-
+	}
+	
 	echo "<h3>".__( 'Google Authenticator Settings', 'google-authenticator' )."</h3>\n";
 
 	echo "<table class=\"form-table\">\n";
@@ -173,7 +211,7 @@ function profile_personal_options() {
 	echo "<tr>\n";
 	echo "<th scope=\"row\">".__( 'Active', 'google-authenticator' )."</th>\n";
 	echo "<td>\n";
-	echo "<div><input name=\"GA_enabled\" id=\"GA_enabled\" class=\"tog\" type=\"checkbox\"" . checked( $GA_enabled, 'enabled', false ) . "/></div>\n";
+	echo "<input name=\"GA_enabled\" id=\"GA_enabled\" class=\"tog\" type=\"checkbox\"" . checked( $GA_enabled, 'enabled', false ) . "/>\n";
 	echo "</td>\n";
 	echo "</tr>\n";
 
@@ -184,13 +222,13 @@ function profile_personal_options() {
 	if ( $is_profile_page || IS_PROFILE_PAGE ) {
 		echo "<tr>\n";
 		echo "<th><label for=\"GA_description\">".__('Description','google-authenticator')."</label></th>\n";
-		echo "<td><input name=\"GA_description\" id=\"GA_description\" value=\"{$GA_description}\"  type=\"text\" /><span class=\"description\">".__(' Description that you\'ll see in the Google Authenticator app on your phone.','google-authenticator')."</span><br /></td>\n";
+		echo "<td><input name=\"GA_description\" id=\"GA_description\" value=\"{$GA_description}\"  type=\"text\" size=\"25\" /><span class=\"description\">".__(' Description that you\'ll see in the Google Authenticator app on your phone.','google-authenticator')."</span><br /></td>\n";
 		echo "</tr>\n";
 
 		echo "<tr>\n";
 		echo "<th><label for=\"GA_secret\">".__('Secret','google-authenticator')."</label></th>\n";
 		echo "<td>\n";
-		echo "<input name=\"GA_secret\" id=\"GA_secret\" value=\"{$GA_secret}\" readonly=\"true\"  type=\"text\"  />";
+		echo "<input name=\"GA_secret\" id=\"GA_secret\" value=\"{$GA_secret}\" readonly=\"readonly\"  type=\"text\" size=\"25\" />";
 		echo "<input name=\"GA_newsecret\" id=\"GA_newsecret\" value=\"".__("Create new secret",'google-authenticator')."\"   type=\"button\" class=\"button\" />";
 		echo "<input name=\"show_qr\" id=\"show_qr\" value=\"".__("Show/Hide QR code",'google-authenticator')."\"   type=\"button\" class=\"button\" onclick=\"jQuery('#GA_QR_INFO').toggle('slow');\" />";
 		echo "</td>\n";
@@ -204,13 +242,29 @@ function profile_personal_options() {
 		echo "</div></td>\n";
 		echo "</tr>\n";
 
+		echo "<tr>\n";
+		echo "<th scope=\"row\">".__( 'Enable App password', 'google-authenticator' )."</th>\n";
+		echo "<td>\n";
+		echo "<input name=\"GA_pwdenabled\" id=\"GA_pwdenabled\" class=\"tog\" type=\"checkbox\"" . checked( $GA_pwdenabled, 'enabled', false ) . "/><span class=\"description\">".__(' Enabling an App password will decrease your overall login security.','google-authenticator')."</span>\n";
+		echo "</td>\n";
+		echo "</tr>\n";
+		
+		echo "<tr>\n";
+		echo "<th></th>\n";
+		echo "<td>\n";
+		echo "<input name=\"GA_password\" id=\"GA_password\" readonly=\"readonly\" value=\"".$GA_password."\" type=\"text\" size=\"25\" />";
+		echo "<input name=\"GA_createpassword\" id=\"GA_createpassword\" value=\"".__("Create new password",'google-authenticator')."\"   type=\"button\" class=\"button\" />";
+		echo "<span class=\"description\" id=\"GA_passworddesc\">".__(' Password is not stored in cleartext, this is your only chance to see it.','google-authenticator')."</span>\n";
+		echo "</td>\n";
+		echo "</tr>\n";
 	}
-
+	
 
 	echo "</tbody></table>\n";
 	echo "<script type=\"text/javascript\">\n";
 	echo "var GAnonce='".wp_create_nonce('GoogleAuthenticatoraction')."';\n";
   	echo <<<ENDOFJS
+  	var pwdata;
 	jQuery('#GA_newsecret').bind('click', function() {
 		var data=new Object();
 		data['action']	= 'GoogleAuthenticator_action';
@@ -230,6 +284,36 @@ function profile_personal_options() {
   		jQuery('#GA_QRCODE').attr('src',qrcodeurl);
 	});
 	
+	jQuery('#GA_createpassword').bind('click',function() {
+		var data=new Object();
+		data['action']	= 'GoogleAuthenticator_action';
+		data['nonce']	= GAnonce;
+		data['save']	= 1;
+		jQuery.post(ajaxurl, data, function(response) {
+  			jQuery('#GA_password').val(response['new-secret'].match(new RegExp(".{0,4}","g")).join(' '));
+  			jQuery('#GA_passworddesc').show();
+  		});  	
+	});
+	
+	jQuery('#GA_enabled').bind('change',function() {
+		GoogleAuthenticator_apppasswordcontrol();
+	});
+
+	jQuery(document).ready(function() {
+		jQuery('#GA_passworddesc').hide();
+		GoogleAuthenticator_apppasswordcontrol();
+	});
+	
+	function GoogleAuthenticator_apppasswordcontrol() {
+		if (jQuery('#GA_enabled').is(':checked')) {
+			jQuery('#GA_pwdenabled').removeAttr('disabled');
+			jQuery('#GA_createpassword').removeAttr('disabled');
+		} else {
+			jQuery('#GA_pwdenabled').removeAttr('checked')
+			jQuery('#GA_pwdenabled').attr('disabled', true);
+			jQuery('#GA_createpassword').attr('disabled', true);
+		}
+	}		
 </script>
 ENDOFJS;
 		
@@ -243,16 +327,32 @@ function personal_options_update() {
 
 	$GA_enabled		= trim( $_POST['GA_enabled'] );
 	$GA_secret		= trim( $_POST['GA_secret'] );
-	$GA_description	= trim( $_POST['GA_description'] );
+	$GA_pwdenabled	= trim( $_POST['GA_pwdenabled'] );
+	$GA_password	= str_replace(' ', '', trim( $_POST['GA_password'] ) );
 	
-	if ( '' == $GA_enabled )
+	if ( '' == $GA_enabled ) {
 		$GA_enabled = 'disabled';
-    else
+    } else {
 		$GA_enabled = 'enabled';
+	}
+
+	if ( '' == $GA_pwdenabled ) {
+		$GA_pwdenabled = 'disabled';
+    } else {
+		$GA_pwdenabled = 'enabled';
+	}
+	
+	// Only store password if a new one has been generated.
+	if (strtoupper($GA_password) != 'XXXXXXXXXXXXXXXX' ) {
+		// Store the password in a format that can be expanded easily later on if needed.
+		$GA_password = array( 'appname' => 'Default', 'password' => sha1( $GA_password ) );
+		update_user_option( $user_id, 'googleauthenticator_passwords', json_encode( $GA_password ), true );
+	}
 	
 	update_user_option( $user_id, 'googleauthenticator_enabled', $GA_enabled, true );
 	update_user_option( $user_id, 'googleauthenticator_secret', $GA_secret, true );
-	update_user_option( $user_id, 'googleauthenticator_description', $GA_description, true );
+	update_user_option( $user_id, 'googleauthenticator_pwdenabled', $GA_pwdenabled, true );
+
 }
 
 /**
@@ -283,11 +383,12 @@ function edit_user_profile_update() {
 	
 	$GA_enabled	= trim( $_POST['GA_enabled'] );
 
-	if ( '' == $GA_enabled )
+	if ( '' == $GA_enabled ) {
 		$GA_enabled = 'disabled';
-    else
+    } else {
 		$GA_enabled = 'enabled';
-
+	}
+	
 	update_user_option( $user_id, 'googleauthenticator_enabled', $GA_enabled, true );
 }
 

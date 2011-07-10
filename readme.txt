@@ -3,8 +3,8 @@ Contributors: Henrik.Schack
 Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=CA36JVKMLE9EA&lc=DK&item_number=Google%20Authenticator&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted
 Tags: authentication,otp,password,security,login,android,iphone,blackberry
 Requires at least: 3.1.2
-Tested up to: 3.2-RC2
-Stable tag: 0.30
+Tested up to: 3.2
+Stable tag: 0.35
 
 Google Authenticator for your WordPress blog.
 
@@ -15,6 +15,10 @@ The Google Authenticator plugin for WordPress gives you two-factor authenticatio
 If you are security aware, you may already have the Google Authenticator app installed on your smartphone, using it for two-factor authentication on your Gmail or Google Apps account.
 
 The two-factor authentication requirement can be enabled on a per-user basis. You could enable it for your administrator account, but log in as usual with less privileged accounts.
+
+If You need to maintain your blog using an Android/iPhone app, or any other software using the XMLRPC interface, you can enable the App password feature in this plugin, 
+
+but please note that enabling the App password feature will make your blog less secure.
 
 == Installation ==
 
@@ -28,7 +32,7 @@ The two-factor authentication requirement can be enabled on a per-user basis. Yo
 
 = Can I use Google Authenticator for WordPress with the Android/iPhone apps for WordPress? =
 
-No, that won't work, but you could create a special account for mobile usage and choose not to enable the usage of Google Authenticator for this account.
+Yes, you can enable the App password feature to make that possible, but notice that the XMLRPC interface isn't protected by two-factor authentication, only a long password.
 
 = I want to update the secret, should I just scan the new QR code after creating a new secret? =
 
@@ -46,6 +50,9 @@ The Google Authenticator verification codes are time based, so it's crucial that
 4. Google Authenticator app on Android
 
 == Changelog ==
+
+= 0.35 =
+* Initial WordPress app support added (XMLRPC).
 
 = 0.30 =
 * Code cleanup
