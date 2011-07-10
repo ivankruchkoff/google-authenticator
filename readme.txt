@@ -17,7 +17,6 @@ If you are security aware, you may already have the Google Authenticator app ins
 The two-factor authentication requirement can be enabled on a per-user basis. You could enable it for your administrator account, but log in as usual with less privileged accounts.
 
 If You need to maintain your blog using an Android/iPhone app, or any other software using the XMLRPC interface, you can enable the App password feature in this plugin, 
-
 but please note that enabling the App password feature will make your blog less secure.
 
 == Installation ==
