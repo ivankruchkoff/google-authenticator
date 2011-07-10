@@ -67,3 +67,4 @@ The Google Authenticator verification codes are time based, so it's crucial that
 Thanks to:
 
 [Tobias Bäthge](http://tobias.baethge.com/) for his code rewrite and German translation.
+
