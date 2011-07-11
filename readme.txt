@@ -1,6 +1,6 @@
 === Google Authenticator ===
 Contributors: Henrik.Schack
-Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=CA36JVKMLE9EA&lc=DK&item_number=Google%20Authenticator&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted
+Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=henrik%40schack%2edk&lc=US&item_name=Google%20Authenticator&item_number=Google%20Authenticator&no_shipping=0&no_note=1&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: authentication,otp,password,security,login,android,iphone,blackberry
 Requires at least: 3.1.2
 Tested up to: 3.2
