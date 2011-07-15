@@ -29,6 +29,10 @@ but please note that enabling the App password feature will make your blog less 
 
 == Frequently Asked Questions ==
 
+= The iPhone app keeps telling me I'm trying to scan an authentication token barcode that isn't valid, what to do ? =
+
+Apparently the iPhone app won't accept a barcode containing space characters in the description, removing space characters in the description should fix the problem.
+
 = Can I use Google Authenticator for WordPress with the Android/iPhone apps for WordPress? =
 
 Yes, you can enable the App password feature to make that possible, but notice that the XMLRPC interface isn't protected by two-factor authentication, only a long password.
