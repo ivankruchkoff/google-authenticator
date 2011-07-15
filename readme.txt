@@ -43,7 +43,9 @@ No, you'll have to delete the existing account from the Google Authenticator app
 
 = Sometimes I am unable to log in using this plugin, the first code never works, what's wrong ? =
 
-The Google Authenticator verification codes are time based, so it's crucial that the clock in your phone is accurate and in sync with the time on the server where your WordPress installation is hosted.
+The Google Authenticator verification codes are time based, so it's crucial that the clock in your phone is accurate and in sync with the clock on the server where your WordPress installation is hosted. 
+
+If you have an Android phone, you can use an app like [ClockSync](https://market.android.com/details?id=ru.org.amip.ClockSync) to set your clock in case your Cell provider doesn't provide accurate time information
 
 == Screenshots ==
 
