@@ -4,9 +4,9 @@ Plugin Name: Google Authenticator
 Plugin URI: http://henrik.schack.dk/google-authenticator-for-wordpress
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Henrik Schack
-Version: 0.35
+Version: 0.36
 Author URI: http://henrik.schack.dk/
-Compatibility: WordPress 3.2
+Compatibility: WordPress 3.2.1
 Text Domain: google-authenticator
 Domain Path: /lang
 
@@ -150,20 +150,16 @@ function check_otp( $user, $username = '', $password = '' ) {
 		if ( $this->verify( $GA_secret, $otp ) ) {
 			return $userstate;
 		} else {
-			// No, lets see if an app password is enabled
-			if ( trim( get_user_option( 'googleauthenticator_pwdenabled', $user->ID ) ) == 'enabled' ) {
+			// No, lets see if an app password is enabled, and this is an XMLRPC / APP login ?
+			if ( trim( get_user_option( 'googleauthenticator_pwdenabled', $user->ID ) ) == 'enabled' && ( defined('XMLRPC_REQUEST') || defined('APP_REQUEST') ) ) {
 				$GA_passwords 	= json_decode(  get_user_option( 'googleauthenticator_passwords', $user->ID ) );
 				$passwordsha1	= trim($GA_passwords->{'password'} );
 				$usersha1		= sha1( strtoupper( str_replace( ' ', '', $password ) ) );
 				if ( $passwordsha1 == $usersha1 ) {
 					return new WP_User( $user->ID );
 				} else {
-					if ( $otp == '' ) {
-						// No Google Authenticator code entered, must be a wrong app login attempt
-						return new WP_Error( 'invalid_google_authenticator_password', __( '<strong>ERROR</strong>: The Google Authenticator password is incorrect.', 'google-authenticator' ) );
-					} else {
-						return new WP_Error( 'invalid_google_authenticator_token', __( '<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired.', 'google-authenticator' ) );
-					}			
+					// Wrong XMLRPC/APP password !
+					return new WP_Error( 'invalid_google_authenticator_password', __( '<strong>ERROR</strong>: The Google Authenticator password is incorrect.', 'google-authenticator' ) );
 				} 		 
 			} else {
 				return new WP_Error( 'invalid_google_authenticator_token', __( '<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired.', 'google-authenticator' ) );
