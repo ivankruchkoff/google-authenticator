@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the Google Authenticator package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Google Authenticator 0.35\n"
+"Project-Id-Version: Google Authenticator 0.36\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/google-authenticator\n"
-"POT-Creation-Date: 2011-07-18 20:06:38+00:00\n"
+"POT-Creation-Date: 2011-08-10 20:20:57+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22,66 +22,66 @@ msgstr ""
 msgid "Google Authenticator code"
 msgstr ""
 
-#: google-authenticator.php:163
+#: google-authenticator.php:162
 msgid "<strong>ERROR</strong>: The Google Authenticator password is incorrect."
 msgstr ""
 
-#: google-authenticator.php:165 google-authenticator.php:169
+#: google-authenticator.php:165
 msgid ""
 "<strong>ERROR</strong>: The Google Authenticator code is incorrect or has "
 "expired."
 msgstr ""
 
-#: google-authenticator.php:204
+#: google-authenticator.php:200
 msgid "WordPress Blog"
 msgstr ""
 
-#: google-authenticator.php:207 google-authenticator.php:365
+#: google-authenticator.php:203 google-authenticator.php:361
 msgid "Google Authenticator Settings"
 msgstr ""
 
-#: google-authenticator.php:212 google-authenticator.php:369
+#: google-authenticator.php:208 google-authenticator.php:365
 msgid "Active"
 msgstr ""
 
-#: google-authenticator.php:224
+#: google-authenticator.php:220
 msgid "Description"
 msgstr ""
 
-#: google-authenticator.php:225
+#: google-authenticator.php:221
 msgid ""
 " Description that you'll see in the Google Authenticator app on your phone."
 msgstr ""
 
-#: google-authenticator.php:229
+#: google-authenticator.php:225
 msgid "Secret"
 msgstr ""
 
-#: google-authenticator.php:232
+#: google-authenticator.php:228
 msgid "Create new secret"
 msgstr ""
 
-#: google-authenticator.php:233
+#: google-authenticator.php:229
 msgid "Show/Hide QR code"
 msgstr ""
 
-#: google-authenticator.php:241
+#: google-authenticator.php:237
 msgid "Scan this with the Google Authenticator app."
 msgstr ""
 
-#: google-authenticator.php:246
+#: google-authenticator.php:242
 msgid "Enable App password"
 msgstr ""
 
-#: google-authenticator.php:248
+#: google-authenticator.php:244
 msgid " Enabling an App password will decrease your overall login security."
 msgstr ""
 
-#: google-authenticator.php:256
+#: google-authenticator.php:252
 msgid "Create new password"
 msgstr ""
 
-#: google-authenticator.php:257
+#: google-authenticator.php:253
 msgid ""
 " Password is not stored in cleartext, this is your only chance to see it."
 msgstr ""
