@@ -4,7 +4,7 @@ Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=henri
 Tags: authentication,otp,password,security,login,android,iphone,blackberry
 Requires at least: 3.1.2
 Tested up to: 3.2.1
-Stable tag: 0.36
+Stable tag: 0.37
 
 Google Authenticator for your WordPress blog.
 
@@ -41,11 +41,13 @@ Yes, you can enable the App password feature to make that possible, but notice t
 
 No, you'll have to delete the existing account from the Google Authenticator app on your smartphone before you scan the new QR code, that is unless you change the description as well.
 
-= Sometimes I am unable to log in using this plugin, the first code never works, what's wrong ? =
+= I am unable to log in using this plugin, what's wrong ? =
 
 The Google Authenticator verification codes are time based, so it's crucial that the clock in your phone is accurate and in sync with the clock on the server where your WordPress installation is hosted. 
 
 If you have an Android phone, you can use an app like [ClockSync](https://market.android.com/details?id=ru.org.amip.ClockSync) to set your clock in case your Cell provider doesn't provide accurate time information
+
+Another option is to enable "relaxed mode" in the settings for the plugin, this will enable more valid codes by allowing up to a 4 min. timedrift in each direction.
 
 == Screenshots ==
 
@@ -55,6 +57,9 @@ If you have an Android phone, you can use an app like [ClockSync](https://market
 4. Google Authenticator app on Android
 
 == Changelog ==
+
+= 0.37 =
+* The plugin now supports "relaxed mode" when authenticating. If selected, codes from 4 minutes before and 4 minutes after will work. 30 seconds before and after is still the default setting.
 
 = 0.36 =
 * Bugfix, now an App password can only be used for XMLRPC/APP-Request logins.
@@ -75,4 +80,6 @@ If you have an Android phone, you can use an app like [ClockSync](https://market
 Thanks to:
 
 [Tobias Bäthge](http://tobias.baethge.com/) for his code rewrite and German translation.
+
+[Pascal de Bruijn](http://blog.pcode.nl/) for his "relaxed mode" idea.
 
