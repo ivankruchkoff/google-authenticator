@@ -4,7 +4,7 @@ Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=henri
 Tags: authentication,otp,password,security,login,android,iphone,blackberry
 Requires at least: 3.1.2
 Tested up to: 3.2.1
-Stable tag: 0.37
+Stable tag: 0.38
 
 Google Authenticator for your WordPress blog.
 
@@ -58,6 +58,9 @@ Another option is to enable "relaxed mode" in the settings for the plugin, this 
 
 == Changelog ==
 
+= 0.38 =
+* Usability fix, input field for codes changed from password to text type.
+
 = 0.37 =
 * The plugin now supports "relaxed mode" when authenticating. If selected, codes from 4 minutes before and 4 minutes after will work. 30 seconds before and after is still the default setting.
 
@@ -82,4 +85,6 @@ Thanks to:
 [Tobias Bäthge](http://tobias.baethge.com/) for his code rewrite and German translation.
 
 [Pascal de Bruijn](http://blog.pcode.nl/) for his "relaxed mode" idea.
+
+[Daniel Werl](http://technobabbl.es/) for his usability tips.
 
