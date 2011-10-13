@@ -4,7 +4,7 @@ Plugin Name: Google Authenticator
 Plugin URI: http://henrik.schack.dk/google-authenticator-for-wordpress
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Henrik Schack
-Version: 0.37
+Version: 0.38
 Author URI: http://henrik.schack.dk/
 Compatibility: WordPress 3.2.1
 Text Domain: google-authenticator
@@ -15,6 +15,7 @@ Domain Path: /lang
 	Thanks to Bryan Ruiz for his Base32 encode/decode class, found at php.net.
 	Thanks to Tobias Bäthge for his major code rewrite and German translation.
 	Thanks to Pascal de Bruijn for his relaxed mode idea.
+	Thanks to Daniel Werl for his usability tips.
 	
 ----------------------------------------------------------------------------
 
@@ -129,7 +130,7 @@ function create_secret() {
 function loginform() {
     echo "\t<p>\n";
     echo "\t\t<label><a href=\"http://code.google.com/p/google-authenticator/\" target=\"_blank\" title=\"".__('If you don\'t have Google Authenticator enabled for your WordPress account, leave this field empty.','google-authenticator')."\">".__('Google Authenticator code','google-authenticator')."</a><span id=\"google-auth-info\"></span><br />\n";
-    echo "\t\t<input type=\"password\" name=\"otp\" id=\"user_email\" class=\"input\" value=\"\" size=\"20\" tabindex=\"25\" /></label>\n";
+    echo "\t\t<input type=\"text\" name=\"otp\" id=\"user_email\" class=\"input\" value=\"\" size=\"20\" tabindex=\"25\" /></label>\n";
     echo "\t</p>\n";
 }
 
