@@ -4,7 +4,7 @@ Plugin Name: Google Authenticator
 Plugin URI: http://henrik.schack.dk/google-authenticator-for-wordpress
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Henrik Schack
-Version: 0.38
+Version: 0.39
 Author URI: http://henrik.schack.dk/
 Compatibility: WordPress 3.2.1
 Text Domain: google-authenticator
@@ -345,6 +345,7 @@ function personal_options_update() {
 	global $user_id;
 
 	$GA_enabled		= trim( $_POST['GA_enabled'] );
+	$GA_description	= trim( $_POST['GA_description'] );
 	$GA_relaxedmode	= trim( $_POST['GA_relaxedmode'] );
 	$GA_secret		= trim( $_POST['GA_secret'] );
 	$GA_pwdenabled	= trim( $_POST['GA_pwdenabled'] );
@@ -377,6 +378,7 @@ function personal_options_update() {
 	}
 	
 	update_user_option( $user_id, 'googleauthenticator_enabled', $GA_enabled, true );
+	update_user_option( $user_id, 'googleauthenticator_description', $GA_description, true );
 	update_user_option( $user_id, 'googleauthenticator_relaxedmode', $GA_relaxedmode, true );
 	update_user_option( $user_id, 'googleauthenticator_secret', $GA_secret, true );
 	update_user_option( $user_id, 'googleauthenticator_pwdenabled', $GA_pwdenabled, true );
