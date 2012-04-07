@@ -3,8 +3,8 @@ Contributors: Henrik.Schack
 Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=henrik%40schack%2edk&lc=US&item_name=Google%20Authenticator&item_number=Google%20Authenticator&no_shipping=0&no_note=1&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: authentication,otp,password,security,login,android,iphone,blackberry
 Requires at least: 3.1.2
-Tested up to: 3.3
-Stable tag: 0.39
+Tested up to: 3.3.1
+Stable tag: 0.40
 
 Google Authenticator for your WordPress blog.
 
@@ -58,6 +58,9 @@ Another option is to enable "relaxed mode" in the settings for the plugin, this 
 
 == Changelog ==
 
+= 0.40 =
+* Bugfix, typo corrected and PHP notices removed. Thanks to Dion Hulse for his patch.
+
 = 0.39 =
 * Bugfix, Description was not saved to WordPress database when updating profile. Thanks to xxdesmus for noticing this.
 
@@ -90,5 +93,7 @@ Thanks to:
 [Pascal de Bruijn](http://blog.pcode.nl/) for his "relaxed mode" idea.
 
 [Daniel Werl](http://technobabbl.es/) for his usability tips.
+
+[Dion Hulse](http://dd32.id.au/) for his bugfixes.
 
 

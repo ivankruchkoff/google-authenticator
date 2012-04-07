@@ -4,9 +4,9 @@ Plugin Name: Google Authenticator
 Plugin URI: http://henrik.schack.dk/google-authenticator-for-wordpress
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Henrik Schack
-Version: 0.39
+Version: 0.40
 Author URI: http://henrik.schack.dk/
-Compatibility: WordPress 3.2.1
+Compatibility: WordPress 3.3.1
 Text Domain: google-authenticator
 Domain Path: /lang
 
@@ -16,10 +16,11 @@ Domain Path: /lang
 	Thanks to Tobias Bäthge for his major code rewrite and German translation.
 	Thanks to Pascal de Bruijn for his relaxed mode idea.
 	Thanks to Daniel Werl for his usability tips.
+	Thanks to Dion Hulse for his bugfixes.
 	
 ----------------------------------------------------------------------------
 
-    Copyright 2011  Henrik Schack  (email : henrik@schack.dk)
+    Copyright 2012  Henrik Schack  (email : henrik@schack.dk)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -129,7 +130,7 @@ function create_secret() {
  */
 function loginform() {
     echo "\t<p>\n";
-    echo "\t\t<label><a href=\"http://code.google.com/p/google-authenticator/\" target=\"_blank\" title=\"".__('If you don\'t have Google Authenticator enabled for your WordPress account, leave this field empty.','google-authenticator')."\">".__('Google Authenticator code','google-authenticator')."</a><span id=\"google-auth-info\"></span><br />\n";
+    echo "\t\t<label title=\"".__('If you don\'t have Google Authenticator enabled for your WordPress account, leave this field empty.','google-authenticator')."\">".__('Google Authenticator code','google-authenticator')."<span id=\"google-auth-info\"></span><br />\n";
     echo "\t\t<input type=\"text\" name=\"otp\" id=\"user_email\" class=\"input\" value=\"\" size=\"20\" tabindex=\"25\" /></label>\n";
     echo "\t</p>\n";
 }
@@ -197,7 +198,7 @@ function profile_personal_options() {
 	$GA_enabled			= trim( get_user_option( 'googleauthenticator_enabled', $user_id ) );
 	$GA_relaxedmode		= trim( get_user_option( 'googleauthenticator_relaxedmode', $user_id ) );
 	$GA_description		= trim( get_user_option( 'googleauthenticator_description', $user_id ) );
-	$GA_pwdenabled		= trim( get_user_option( 'googleauthenticator_pwdenabled', $userid ) );
+	$GA_pwdenabled		= trim( get_user_option( 'googleauthenticator_pwdenabled', $user_id ) );
 	$GA_password		= trim( get_user_option( 'googleauthenticator_passwords', $user_id ) );
 	
 	// We dont store the generated app password in cleartext so there is no point in trying
@@ -344,29 +345,29 @@ ENDOFJS;
 function personal_options_update() {
 	global $user_id;
 
-	$GA_enabled		= trim( $_POST['GA_enabled'] );
+	$GA_enabled	= ! empty( $_POST['GA_enabled'] );
 	$GA_description	= trim( $_POST['GA_description'] );
-	$GA_relaxedmode	= trim( $_POST['GA_relaxedmode'] );
-	$GA_secret		= trim( $_POST['GA_secret'] );
-	$GA_pwdenabled	= trim( $_POST['GA_pwdenabled'] );
+	$GA_relaxedmode	= ! empty( $_POST['GA_relaxedmode'] );
+	$GA_secret	= trim( $_POST['GA_secret'] );
+	$GA_pwdenabled	= ! empty( $_POST['GA_pwdenabled'] );
 	$GA_password	= str_replace(' ', '', trim( $_POST['GA_password'] ) );
 	
-	if ( '' == $GA_enabled ) {
+	if ( ! $GA_enabled ) {
 		$GA_enabled = 'disabled';
-    } else {
+	} else {
 		$GA_enabled = 'enabled';
 	}
 
-	if ( '' == $GA_relaxedmode ) {
+	if ( ! $GA_relaxedmode ) {
 		$GA_relaxedmode = 'disabled';
-    } else {
+	} else {
 		$GA_relaxedmode = 'enabled';
 	}
 
 
-	if ( '' == $GA_pwdenabled ) {
+	if ( ! $GA_pwdenabled ) {
 		$GA_pwdenabled = 'disabled';
-    } else {
+	} else {
 		$GA_pwdenabled = 'enabled';
 	}
 	
@@ -411,11 +412,11 @@ function edit_user_profile() {
 function edit_user_profile_update() {
 	global $user_id;
 	
-	$GA_enabled	= trim( $_POST['GA_enabled'] );
+	$GA_enabled	= ! empty( $_POST['GA_enabled'] );
 
-	if ( '' == $GA_enabled ) {
+	if ( ! $GA_enabled ) {
 		$GA_enabled = 'disabled';
-    } else {
+	} else {
 		$GA_enabled = 'enabled';
 	}
 	
