@@ -4,9 +4,9 @@ Plugin Name: Google Authenticator
 Plugin URI: http://henrik.schack.dk/google-authenticator-for-wordpress
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Henrik Schack
-Version: 0.40
+Version: 0.41
 Author URI: http://henrik.schack.dk/
-Compatibility: WordPress 3.3.1
+Compatibility: WordPress 3.3.2
 Text Domain: google-authenticator
 Domain Path: /lang
 
@@ -17,7 +17,8 @@ Domain Path: /lang
 	Thanks to Pascal de Bruijn for his relaxed mode idea.
 	Thanks to Daniel Werl for his usability tips.
 	Thanks to Dion Hulse for his bugfixes.
-	
+	Thanks to Aldo Latino for his Italian translation.
+
 ----------------------------------------------------------------------------
 
     Copyright 2012  Henrik Schack  (email : henrik@schack.dk)
