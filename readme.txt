@@ -4,7 +4,7 @@ Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=henri
 Tags: authentication,otp,password,security,login,android,iphone,blackberry
 Requires at least: 3.1.2
 Tested up to: 3.4.1
-Stable tag: 0.42
+Stable tag: 0.43
 
 Google Authenticator for your WordPress blog.
 
@@ -49,6 +49,10 @@ If you have an Android phone, you can use an app like [ClockSync](https://market
 
 Another option is to enable "relaxed mode" in the settings for the plugin, this will enable more valid codes by allowing up to a 4 min. timedrift in each direction.
 
+= I have several users on my WordPress installation, is that a supported configuration ? =
+
+Yes, each user has his own Google Authenticator settings.
+
 == Screenshots ==
 
 1. The enhanced log-in box.
@@ -57,6 +61,9 @@ Another option is to enable "relaxed mode" in the settings for the plugin, this 
 4. Google Authenticator app on Android
 
 == Changelog ==
+
+= 0.43 =
+* It's now possible for an admin to hide the Google Authenticaator settings on a per-user basis. (Feature request by : Skate-O)
 
 = 0.42 =
 * Autocomplete disabled on code input field. (Feature request by : hiphopsmurf)

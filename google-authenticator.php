@@ -4,7 +4,7 @@ Plugin Name: Google Authenticator
 Plugin URI: http://henrik.schack.dk/google-authenticator-for-wordpress
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Henrik Schack
-Version: 0.42
+Version: 0.43
 Author URI: http://henrik.schack.dk/
 Compatibility: WordPress 3.4.1
 Text Domain: google-authenticator
@@ -205,6 +205,10 @@ function check_otp( $user, $username = '', $password = '' ) {
  */
 function profile_personal_options() {
 	global $user_id, $is_profile_page;
+
+	// If editing of Google Authenticator settings has been disabled, just return
+	$GA_hidefromuser = trim( get_user_option( 'googleauthenticator_hidefromuser', $user_id ) );
+	if ( $GA_hidefromuser == 'enabled') return;
 	
 	$GA_secret			= trim( get_user_option( 'googleauthenticator_secret', $user_id ) );
 	$GA_enabled			= trim( get_user_option( 'googleauthenticator_enabled', $user_id ) );
@@ -357,6 +361,11 @@ ENDOFJS;
 function personal_options_update() {
 	global $user_id;
 
+	// If editing of Google Authenticator settings has been disabled, just return
+	$GA_hidefromuser = trim( get_user_option( 'googleauthenticator_hidefromuser', $user_id ) );
+	if ( $GA_hidefromuser == 'enabled') return;
+
+
 	$GA_enabled	= ! empty( $_POST['GA_enabled'] );
 	$GA_description	= trim( $_POST['GA_description'] );
 	$GA_relaxedmode	= ! empty( $_POST['GA_relaxedmode'] );
@@ -404,16 +413,26 @@ function personal_options_update() {
  */
 function edit_user_profile() {
 	global $user_id;
-	$GA_enabled = trim( get_user_option( 'googleauthenticator_enabled', $user_id ) );
+	$GA_enabled      = trim( get_user_option( 'googleauthenticator_enabled', $user_id ) );
+	$GA_hidefromuser = trim( get_user_option( 'googleauthenticator_hidefromuser', $user_id ) );
 	echo "<h3>".__('Google Authenticator Settings','google-authenticator')."</h3>\n";
 	echo "<table class=\"form-table\">\n";
 	echo "<tbody>\n";
+
+	echo "<tr>\n";
+	echo "<th scope=\"row\">".__('Hide settings from user','google-authenticator')."</th>\n";
+	echo "<td>\n";
+	echo "<div><input name=\"GA_hidefromuser\" id=\"GA_hidefromuser\"  class=\"tog\" type=\"checkbox\"" . checked( $GA_hidefromuser, 'enabled', false ) . "/>\n";
+	echo "</td>\n";
+	echo "</tr>\n";
+
 	echo "<tr>\n";
 	echo "<th scope=\"row\">".__('Active','google-authenticator')."</th>\n";
 	echo "<td>\n";
 	echo "<div><input name=\"GA_enabled\" id=\"GA_enabled\"  class=\"tog\" type=\"checkbox\"" . checked( $GA_enabled, 'enabled', false ) . "/>\n";
 	echo "</td>\n";
 	echo "</tr>\n";
+
 	echo "</tbody>\n";
 	echo "</table>\n";
 }
@@ -424,15 +443,24 @@ function edit_user_profile() {
 function edit_user_profile_update() {
 	global $user_id;
 	
-	$GA_enabled	= ! empty( $_POST['GA_enabled'] );
+	$GA_enabled	     = ! empty( $_POST['GA_enabled'] );
+	$GA_hidefromuser = ! empty( $_POST['GA_hidefromuser'] );
 
 	if ( ! $GA_enabled ) {
 		$GA_enabled = 'disabled';
 	} else {
 		$GA_enabled = 'enabled';
 	}
-	
+
+	if ( ! $GA_hidefromuser ) {
+		$GA_hidefromuser = 'disabled';
+	} else {
+		$GA_hidefromuser = 'enabled';
+	}
+
 	update_user_option( $user_id, 'googleauthenticator_enabled', $GA_enabled, true );
+	update_user_option( $user_id, 'googleauthenticator_hidefromuser', $GA_hidefromuser, true );
+
 }
 
 
