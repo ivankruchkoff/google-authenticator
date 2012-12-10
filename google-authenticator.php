@@ -486,5 +486,5 @@ function ajax_callback() {
 
 } // end class
 
-new GoogleAuthenticator;
+$google_authenticator = new GoogleAuthenticator;
 ?>
