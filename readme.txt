@@ -2,9 +2,9 @@
 Contributors: Henrik.Schack
 Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=henrik%40schack%2edk&lc=US&item_name=Google%20Authenticator&item_number=Google%20Authenticator&no_shipping=0&no_note=1&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: authentication,otp,password,security,login,android,iphone,blackberry
-Requires at least: 3.1.2
-Tested up to: 3.4.1
-Stable tag: 0.43
+Requires at least: 3.5
+Tested up to: 3.5
+Stable tag: 0.44
 
 Google Authenticator for your WordPress blog.
 
@@ -12,7 +12,7 @@ Google Authenticator for your WordPress blog.
 
 The Google Authenticator plugin for WordPress gives you two-factor authentication using the Google Authenticator app for Android/iPhone/Blackberry.
 
-If you are security aware, you may already have the Google Authenticator app installed on your smartphone, using it for two-factor authentication on your Gmail or Google Apps account.
+If you are security aware, you may already have the Google Authenticator app installed on your smartphone, using it for two-factor authentication on Gmail/Dropbox/Lastpass/Amazon etc.
 
 The two-factor authentication requirement can be enabled on a per-user basis. You could enable it for your administrator account, but log in as usual with less privileged accounts.
 
@@ -20,12 +20,13 @@ If You need to maintain your blog using an Android/iPhone app, or any other soft
 but please note that enabling the App password feature will make your blog less secure.
 
 == Installation ==
-
-1. Install and activate the plugin.
-2. Enter a description on the Users -> Profile and Personal options page, in the Google Authenticator section.
-3. Scan the generated QR code with your phone, or enter the secret manually (remember to pick the time based one).
-4. Remember to hit the **Update profile** button at the bottom of the page before leaving the Personal options page.
-4. That's it, your WordPress blog is now a little more secure.
+1. Make sure your webhost is capable of providing accurate time information for PHP/WordPress, ie. make sure a NTP daemon is running on the server.
+2. Install and activate the plugin.
+3. Enter a description on the Users -> Profile and Personal options page, in the Google Authenticator section.
+4. Scan the generated QR code with your phone, or enter the secret manually, remember to pick the time based one.  
+You may also want to write down the secret on a piece of paper and store it in a safe place. 
+5. Remember to hit the **Update profile** button at the bottom of the page before leaving the Personal options page.
+6. That's it, your WordPress blog is now a little more secure.
 
 == Frequently Asked Questions ==
 
@@ -53,6 +54,15 @@ Another option is to enable "relaxed mode" in the settings for the plugin, this 
 
 Yes, each user has his own Google Authenticator settings.
 
+= During installation I forgot the thing about making sure my webhost is capable of providing accurate time information, I'm now unable to login, please help. =
+
+If you have SSH or FTP access to your webhosting account, you can manually delete the plugin from your WordPress installation,   
+just delete the wp-content/plugins/google-authenticator directory, and you'll be able to login using username/password again.
+
+= I don't own a Smartphone, isn't there another way to generate these secret codes ? =
+Yes, there is a Chrome browser extension you can use : http://4bits.dk/Uwg09z
+
+
 == Screenshots ==
 
 1. The enhanced log-in box.
@@ -61,6 +71,15 @@ Yes, each user has his own Google Authenticator settings.
 4. Google Authenticator app on Android
 
 == Changelog ==
+
+= 0.44 =
+* Installation/FAQ section updated.
+* Simplified Chinese translation by Kaijia Feng added. 
+* Tabindex on loginpage removed, no longer needed, was used by older WordPress installations.
+* Inputfield renamed to "googleotp".
+* Defaultdescription changed to "WordPressBlog" to avoid trouble for iPhone users.
+* Compatibility with Ryan Hellyer's plugin http://geek.ryanhellyer.net/products/deactivate-google-authenticator/
+* Must enter all 6 code digits.
 
 = 0.43 =
 * It's now possible for an admin to hide the Google Authenticaator settings on a per-user basis. (Feature request by : Skate-O)
@@ -110,3 +129,5 @@ Thanks to:
 [Dion Hulse](http://dd32.id.au/) for his bugfixes.
 
 [Aldo Latino](http://profiles.wordpress.org/users/aldolat/) for his Italian translation.
+
+[Kaijia Feng](http://www.kaijia.me/) for his Simplified Chinese translation. 

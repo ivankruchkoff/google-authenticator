@@ -4,9 +4,9 @@ Plugin Name: Google Authenticator
 Plugin URI: http://henrik.schack.dk/google-authenticator-for-wordpress
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Henrik Schack
-Version: 0.43
+Version: 0.44
 Author URI: http://henrik.schack.dk/
-Compatibility: WordPress 3.4.1
+Compatibility: WordPress 3.5
 Text Domain: google-authenticator
 Domain Path: /lang
 
@@ -18,10 +18,11 @@ Domain Path: /lang
 	Thanks to Daniel Werl for his usability tips.
 	Thanks to Dion Hulse for his bugfixes.
 	Thanks to Aldo Latino for his Italian translation.
+	Thanks to Kaijia Feng for his Simplified Chinese translation. 
 
 ----------------------------------------------------------------------------
 
-    Copyright 2012  Henrik Schack  (email : henrik@schack.dk)
+    Copyright 2013  Henrik Schack  (email : henrik@schack.dk)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,6 +76,13 @@ function init() {
  * Check the verification code entered by the user.
  */
 function verify( $secretkey, $thistry, $relaxedmode ) {
+
+	// Did the user enter 6 digits ?
+	if ( strlen( $thistry ) != 6) {
+		return false;
+	} else {
+		$thistry = intval ( $thistry );
+	}
 
 	// If user is running in relaxed mode, we allow more time drifting
 	// ±4 min, as opposed to ± 30 seconds in normal mode.
@@ -133,7 +141,7 @@ function create_secret() {
 function loginform() {
     echo "\t<p>\n";
     echo "\t\t<label title=\"".__('If you don\'t have Google Authenticator enabled for your WordPress account, leave this field empty.','google-authenticator')."\">".__('Google Authenticator code','google-authenticator')."<span id=\"google-auth-info\"></span><br />\n";
-    echo "\t\t<input type=\"text\" name=\"otp\" id=\"user_email\" class=\"input\" value=\"\" size=\"20\" tabindex=\"25\" /></label>\n";
+    echo "\t\t<input type=\"text\" name=\"googleotp\" id=\"user_email\" class=\"input\" value=\"\" size=\"20\" /></label>\n";
     echo "\t</p>\n";
 }
 
@@ -172,7 +180,7 @@ function check_otp( $user, $username = '', $password = '' ) {
 		$GA_relaxedmode = trim( get_user_option( 'googleauthenticator_relaxedmode', $user->ID ) );
 		
 		// Get the verification code entered by the user trying to login
-		$otp = intval( trim( $_POST[ 'otp' ] ) );
+		$otp = trim( $_POST[ 'googleotp' ] );
 	
 		// Valid code ?
 		if ( $this->verify( $GA_secret, $otp, $GA_relaxedmode ) ) {
@@ -230,7 +238,7 @@ function profile_personal_options() {
 	
 	// Use "WordPress Blog" as default description
 	if ( '' == $GA_description ) {
-		$GA_description = __( 'WordPress Blog', 'google-authenticator' );
+		$GA_description = __( 'WordPressBlog', 'google-authenticator' );
 	}
 	
 	echo "<h3>".__( 'Google Authenticator Settings', 'google-authenticator' )."</h3>\n";
