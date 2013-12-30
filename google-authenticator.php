@@ -4,9 +4,9 @@ Plugin Name: Google Authenticator
 Plugin URI: http://henrik.schack.dk/google-authenticator-for-wordpress
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Henrik Schack
-Version: 0.44
+Version: 0.45
 Author URI: http://henrik.schack.dk/
-Compatibility: WordPress 3.5
+Compatibility: WordPress 3.8
 Text Domain: google-authenticator
 Domain Path: /lang
 
@@ -18,7 +18,9 @@ Domain Path: /lang
 	Thanks to Daniel Werl for his usability tips.
 	Thanks to Dion Hulse for his bugfixes.
 	Thanks to Aldo Latino for his Italian translation.
-	Thanks to Kaijia Feng for his Simplified Chinese translation. 
+	Thanks to Kaijia Feng for his Simplified Chinese translation.
+	Thanks to Ian Dunn for fixing some depricated function calls.
+	Thanks to Kimmo Suominen for fixing the iPhone description issue.
 
 ----------------------------------------------------------------------------
 
@@ -113,7 +115,7 @@ function verify( $secretkey, $thistry, $relaxedmode ) {
 		// Only 32 bits
 		$value = $value & 0x7FFFFFFF;
 		$value = $value % 1000000;
-		if ( $value == $thistry ) {
+		if ( $value === $thistry ) {
 			return true;
 		}	
 	}
@@ -141,7 +143,7 @@ function create_secret() {
 function loginform() {
     echo "\t<p>\n";
     echo "\t\t<label title=\"".__('If you don\'t have Google Authenticator enabled for your WordPress account, leave this field empty.','google-authenticator')."\">".__('Google Authenticator code','google-authenticator')."<span id=\"google-auth-info\"></span><br />\n";
-    echo "\t\t<input type=\"text\" name=\"googleotp\" id=\"user_email\" class=\"input\" value=\"\" size=\"20\" /></label>\n";
+    echo "\t\t<input type=\"text\" name=\"googleotp\" id=\"user_email\" class=\"input\" value=\"\" size=\"20\" style=\"ime-mode: inactive;\" /></label>\n";
     echo "\t</p>\n";
 }
 
@@ -168,10 +170,10 @@ function check_otp( $user, $username = '', $password = '' ) {
 
 	// Get information on user, we need this in case an app password has been enabled,
 	// since the $user var only contain an error at this point in the login flow.
-	$user = get_userdatabylogin( $username );
+	$user = get_user_by( 'login', $username );
 
 	// Does the user have the Google Authenticator enabled ?
-	if ( trim(get_user_option( 'googleauthenticator_enabled', $user->ID ) ) == 'enabled' ) {
+	if ( isset( $user->ID ) && trim(get_user_option( 'googleauthenticator_enabled', $user->ID ) ) == 'enabled' ) {
 
 		// Get the users secret
 		$GA_secret = trim( get_user_option( 'googleauthenticator_secret', $user->ID ) );
@@ -253,7 +255,7 @@ function profile_personal_options() {
 	echo "</tr>\n";
 
 	// Create URL for the Google charts QR code generator.
-	$chl = urlencode( "otpauth://totp/{$GA_description}?secret={$GA_secret}" );
+	$chl = rawurlencode( 'otpauth://totp/'.rawurlencode( $GA_description ).'?secret='.rawurlencode( $GA_secret ) );
 	$qrcodeurl = "https://chart.googleapis.com/chart?cht=qr&amp;chs=300x300&amp;chld=H|0&amp;chl={$chl}";
 
 	if ( $is_profile_page || IS_PROFILE_PAGE ) {
@@ -375,7 +377,7 @@ function personal_options_update() {
 
 
 	$GA_enabled	= ! empty( $_POST['GA_enabled'] );
-	$GA_description	= trim( $_POST['GA_description'] );
+	$GA_description	= trim( sanitize_text_field($_POST['GA_description'] ) );
 	$GA_relaxedmode	= ! empty( $_POST['GA_relaxedmode'] );
 	$GA_secret	= trim( $_POST['GA_secret'] );
 	$GA_pwdenabled	= ! empty( $_POST['GA_pwdenabled'] );
