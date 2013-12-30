@@ -21,6 +21,7 @@ Domain Path: /lang
 	Thanks to Kaijia Feng for his Simplified Chinese translation.
 	Thanks to Ian Dunn for fixing some depricated function calls.
 	Thanks to Kimmo Suominen for fixing the iPhone description issue.
+	Thanks to Alex Concha for some security tips.
 
 ----------------------------------------------------------------------------
 
@@ -191,9 +192,12 @@ function check_otp( $user, $username = '', $password = '' ) {
 			// No, lets see if an app password is enabled, and this is an XMLRPC / APP login ?
 			if ( trim( get_user_option( 'googleauthenticator_pwdenabled', $user->ID ) ) == 'enabled' && ( defined('XMLRPC_REQUEST') || defined('APP_REQUEST') ) ) {
 				$GA_passwords 	= json_decode(  get_user_option( 'googleauthenticator_passwords', $user->ID ) );
-				$passwordsha1	= trim($GA_passwords->{'password'} );
+				$passwordhash	= trim($GA_passwords->{'password'} );
 				$usersha1		= sha1( strtoupper( str_replace( ' ', '', $password ) ) );
-				if ( $passwordsha1 == $usersha1 ) {
+				if ( $passwordhash == $usersha1 ) { // ToDo: Remove after some time when users have migrated to new format
+					return new WP_User( $user->ID );
+				  // Try the new version based on thee wp_hash_password	function
+				} elseif (wp_check_password( strtoupper( str_replace( ' ', '', $password ) ), $passwordhash)) {
 					return new WP_User( $user->ID );
 				} else {
 					// Wrong XMLRPC/APP password !
@@ -405,7 +409,7 @@ function personal_options_update() {
 	// Only store password if a new one has been generated.
 	if (strtoupper($GA_password) != 'XXXXXXXXXXXXXXXX' ) {
 		// Store the password in a format that can be expanded easily later on if needed.
-		$GA_password = array( 'appname' => 'Default', 'password' => sha1( $GA_password ) );
+		$GA_password = array( 'appname' => 'Default', 'password' => wp_hash_password( $GA_password ) );
 		update_user_option( $user_id, 'googleauthenticator_passwords', json_encode( $GA_password ), true );
 	}
 	
