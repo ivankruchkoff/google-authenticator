@@ -183,8 +183,11 @@ function check_otp( $user, $username = '', $password = '' ) {
 		$GA_relaxedmode = trim( get_user_option( 'googleauthenticator_relaxedmode', $user->ID ) );
 		
 		// Get the verification code entered by the user trying to login
-		$otp = trim( $_POST[ 'googleotp' ] );
-	
+		if ( !empty( $_POST['googleotp'] )) { // Prevent PHP notices when using app password login
+			$otp = trim( $_POST[ 'googleotp' ] );
+		} else {
+			$otp = '';
+		}
 		// Valid code ?
 		if ( $this->verify( $GA_secret, $otp, $GA_relaxedmode ) ) {
 			return $userstate;
