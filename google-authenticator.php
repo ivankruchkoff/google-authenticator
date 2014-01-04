@@ -4,7 +4,7 @@ Plugin Name: Google Authenticator
 Plugin URI: http://henrik.schack.dk/google-authenticator-for-wordpress
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Henrik Schack
-Version: 0.45
+Version: 0.46
 Author URI: http://henrik.schack.dk/
 Compatibility: WordPress 3.8
 Text Domain: google-authenticator
@@ -78,7 +78,7 @@ function init() {
 /**
  * Check the verification code entered by the user.
  */
-function verify( $secretkey, $thistry, $relaxedmode ) {
+function verify( $secretkey, $thistry, $relaxedmode, $lasttimeslot ) {
 
 	// Did the user enter 6 digits ?
 	if ( strlen( $thistry ) != 6) {
@@ -117,7 +117,12 @@ function verify( $secretkey, $thistry, $relaxedmode ) {
 		$value = $value & 0x7FFFFFFF;
 		$value = $value % 1000000;
 		if ( $value === $thistry ) {
-			return true;
+			// Check for replay (Man-in-the-middle) attack
+			if ( $lasttimeslot >= ($tm+$i) ) {
+				return false;
+			}
+			// Return timeslot in which login happened.
+			return $tm+$i;
 		}	
 	}
 	return false;
@@ -188,8 +193,12 @@ function check_otp( $user, $username = '', $password = '' ) {
 		} else {
 			$otp = '';
 		}
+		// When was the last successful login performed ?
+		$lasttimeslot = trim( get_user_option( 'googleauthenticator_lasttimeslot', $user->ID ) );
 		// Valid code ?
-		if ( $this->verify( $GA_secret, $otp, $GA_relaxedmode ) ) {
+		if ( $timeslot=$this->verify( $GA_secret, $otp, $GA_relaxedmode, $lasttimeslot ) ) {
+			// Store the timeslot in which login was successful.
+			update_user_option( $user->ID, 'googleauthenticator_lasttimeslot', $timeslot, true );
 			return $userstate;
 		} else {
 			// No, lets see if an app password is enabled, and this is an XMLRPC / APP login ?
@@ -210,7 +219,7 @@ function check_otp( $user, $username = '', $password = '' ) {
 				return new WP_Error( 'invalid_google_authenticator_token', __( '<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired.', 'google-authenticator' ) );
 			}	
 		}
-	}		
+	}
 	// Google Authenticator isn't enabled for this account,
 	// just resume normal authentication.
 	return $userstate;
@@ -329,8 +338,8 @@ function profile_personal_options() {
   			jQuery('#GA_QRCODE').attr('src',qrcodeurl);
   			jQuery('#GA_QR_INFO').show('slow');
   		});  	
-	});  
-	
+	});
+	  
 	jQuery('#GA_description').bind('focus blur change keyup', function() {
   		chl=escape("otpauth://totp/"+jQuery('#GA_description').val()+"?secret="+jQuery('#GA_secret').val());
   		qrcodeurl="https://chart.googleapis.com/chart?cht=qr&chs=300x300&chld=H|0&chl="+chl;
