@@ -4,7 +4,7 @@ Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=henri
 Tags: authentication,otp,password,security,login,android,iphone,blackberry
 Requires at least: 3.8
 Tested up to: 3.8
-Stable tag: 0.45
+Stable tag: 0.46
 
 Google Authenticator for your WordPress blog.
 
@@ -29,10 +29,6 @@ You may also want to write down the secret on a piece of paper and store it in a
 6. That's it, your WordPress blog is now a little more secure.
 
 == Frequently Asked Questions ==
-
-= The iPhone app keeps telling me I'm trying to scan an authentication token barcode that isn't valid, what to do ? =
-
-Apparently the iPhone app won't accept a barcode containing space characters in the description, removing space characters in the description should fix the problem.
 
 = Can I use Google Authenticator for WordPress with the Android/iPhone apps for WordPress? =
 
@@ -71,6 +67,11 @@ Yes, there is a webbased version here : http://gauth.apps.gbraad.nl/ Github proj
 4. Google Authenticator app on Android
 
 == Changelog ==
+
+= 0.46 =
+* Man-in-the-middle attack protection added.
+* Show warning before displaying the QR code.
+* FAQ updated.
 
 = 0.45 =
 * Spaces in the description field should now work on iPhones.
