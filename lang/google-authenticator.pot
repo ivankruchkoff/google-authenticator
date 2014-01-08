@@ -1,101 +1,100 @@
-# Copyright (C) 2010 Google Authenticator
+# Copyright (C) 2014 Google Authenticator
 # This file is distributed under the same license as the Google Authenticator package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Google Authenticator 0.37\n"
+"Project-Id-Version: Google Authenticator 0.46\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/google-authenticator\n"
-"POT-Creation-Date: 2011-08-21 14:25:45+00:00\n"
+"POT-Creation-Date: 2014-01-08 18:59:18+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2010-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2014-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: google-authenticator.php:131
-msgid ""
-"If you don't have Google Authenticator enabled for your WordPress account, "
-"leave this field empty."
+#: google-authenticator.php:155
+msgid "If you don't have Google Authenticator enabled for your WordPress account, leave this field empty."
 msgstr ""
 
-#: google-authenticator.php:131
+#: google-authenticator.php:155
 msgid "Google Authenticator code"
 msgstr ""
 
-#: google-authenticator.php:176
+#: google-authenticator.php:220
 msgid "<strong>ERROR</strong>: The Google Authenticator password is incorrect."
 msgstr ""
 
-#: google-authenticator.php:179
-msgid ""
-"<strong>ERROR</strong>: The Google Authenticator code is incorrect or has "
-"expired."
+#: google-authenticator.php:223
+msgid "<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired."
 msgstr ""
 
-#: google-authenticator.php:215
-msgid "WordPress Blog"
+#: google-authenticator.php:263
+msgid "WordPressBlog"
 msgstr ""
 
-#: google-authenticator.php:218 google-authenticator.php:392
+#: google-authenticator.php:266 google-authenticator.php:465
 msgid "Google Authenticator Settings"
 msgstr ""
 
-#: google-authenticator.php:223 google-authenticator.php:396
+#: google-authenticator.php:271 google-authenticator.php:477
 msgid "Active"
 msgstr ""
 
-#: google-authenticator.php:235
+#: google-authenticator.php:279
 msgid "Relaxed mode"
 msgstr ""
 
-#: google-authenticator.php:237
-msgid ""
-" Relaxed mode allows for more time drifting on your phone clock (&#177;4 "
-"min)."
+#: google-authenticator.php:281
+msgid " Relaxed mode allows for more time drifting on your phone clock (&#177;4 min)."
 msgstr ""
 
-#: google-authenticator.php:242
+#: google-authenticator.php:286
 msgid "Description"
 msgstr ""
 
-#: google-authenticator.php:243
-msgid ""
-" Description that you'll see in the Google Authenticator app on your phone."
+#: google-authenticator.php:287
+msgid " Description that you'll see in the Google Authenticator app on your phone."
 msgstr ""
 
-#: google-authenticator.php:247
+#: google-authenticator.php:291
 msgid "Secret"
 msgstr ""
 
-#: google-authenticator.php:250
+#: google-authenticator.php:294
 msgid "Create new secret"
 msgstr ""
 
-#: google-authenticator.php:251
+#: google-authenticator.php:295
 msgid "Show/Hide QR code"
 msgstr ""
 
-#: google-authenticator.php:259
+#: google-authenticator.php:304
 msgid "Scan this with the Google Authenticator app."
 msgstr ""
 
-#: google-authenticator.php:264
+#: google-authenticator.php:309
 msgid "Enable App password"
 msgstr ""
 
-#: google-authenticator.php:266
+#: google-authenticator.php:311
 msgid " Enabling an App password will decrease your overall login security."
 msgstr ""
 
-#: google-authenticator.php:274
+#: google-authenticator.php:319
 msgid "Create new password"
 msgstr ""
 
-#: google-authenticator.php:275
-msgid ""
-" Password is not stored in cleartext, this is your only chance to see it."
+#: google-authenticator.php:320
+msgid " Password is not stored in cleartext, this is your only chance to see it."
 msgstr ""
 
+#: google-authenticator.php:331
+msgid "WARNING:\\n\\nShowing the QR code will use the Google Chart API to do so.\\nIf you do not trust Google, please press Cancel and enter the code manually."
+msgstr ""
+
+#: google-authenticator.php:470
+msgid "Hide settings from user"
+msgstr ""
 #. Plugin Name of the plugin/theme
 msgid "Google Authenticator"
 msgstr ""
@@ -105,9 +104,7 @@ msgid "http://henrik.schack.dk/google-authenticator-for-wordpress"
 msgstr ""
 
 #. Description of the plugin/theme
-msgid ""
-"Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry "
-"app as One Time Password generator."
+msgid "Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator."
 msgstr ""
 
 #. Author of the plugin/theme
