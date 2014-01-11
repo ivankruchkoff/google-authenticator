@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Google Authenticator\n"
-"POT-Creation-Date: 2014-01-08 19:06+0100\n"
-"PO-Revision-Date: 2014-01-08 19:51+0100\n"
+"POT-Creation-Date: 2014-01-11 08:17+0100\n"
+"PO-Revision-Date: 2014-01-11 08:20+0100\n"
 "Last-Translator: Henrik Schack <henrik@schack.dk>\n"
 "Language-Team: \n"
 "Language: da\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: google-authenticator.php:155
+#: google-authenticator.php:166
 msgid ""
 "If you don't have Google Authenticator enabled for your WordPress account, "
 "leave this field empty."
@@ -26,97 +26,88 @@ msgstr ""
 "Hvis ikke du har aktiveret Google Authenticator for din konto, så lad være "
 "med at skrive noget her."
 
-#: google-authenticator.php:155
+#: google-authenticator.php:166
 msgid "Google Authenticator code"
 msgstr "Google Authenticator kode"
 
-#: google-authenticator.php:220
+#: google-authenticator.php:231
 msgid "<strong>ERROR</strong>: The Google Authenticator password is incorrect."
 msgstr "<strong>ERROR</strong>: Google Authenticator kodeordet er forkert."
 
-#: google-authenticator.php:223
+#: google-authenticator.php:234
 msgid ""
 "<strong>ERROR</strong>: The Google Authenticator code is incorrect or has "
 "expired."
 msgstr ""
 "<strong>ERROR</strong>: Google Authenticator koden er forkert eller udløbet."
 
-#: google-authenticator.php:263
+#: google-authenticator.php:274
 msgid "WordPressBlog"
 msgstr "WordPressBlog"
 
-#: google-authenticator.php:266 google-authenticator.php:465
+#: google-authenticator.php:277 google-authenticator.php:469
 msgid "Google Authenticator Settings"
 msgstr "Google Authenticator indstillinger"
 
-#: google-authenticator.php:271 google-authenticator.php:477
+#: google-authenticator.php:282 google-authenticator.php:481
 msgid "Active"
 msgstr "Aktiv"
 
-#: google-authenticator.php:279
+#: google-authenticator.php:290
 msgid "Relaxed mode"
 msgstr "Afslappet tilstand"
 
-#: google-authenticator.php:281
+#: google-authenticator.php:292
 msgid ""
 " Relaxed mode allows for more time drifting on your phone clock (&#177;4 "
 "min)."
 msgstr ""
 "Afslappet tilstand tillader mere upræcis tid på din telefon (&#177;4 min)."
 
-#: google-authenticator.php:286
+#: google-authenticator.php:297
 msgid "Description"
 msgstr "Beskrivelse"
 
-#: google-authenticator.php:287
+#: google-authenticator.php:298
 msgid ""
 " Description that you'll see in the Google Authenticator app on your phone."
 msgstr "Beskrivelsen du vil se i Google Authenticator app'en på din telefon."
 
-#: google-authenticator.php:291
+#: google-authenticator.php:302
 msgid "Secret"
 msgstr "Hemmelig kode"
 
-#: google-authenticator.php:294
+#: google-authenticator.php:305
 msgid "Create new secret"
 msgstr "Opret ny hemmelig kode"
 
-#: google-authenticator.php:295
+#: google-authenticator.php:306
 msgid "Show/Hide QR code"
 msgstr "Vis/Gem QR kode"
 
-#: google-authenticator.php:304
+#: google-authenticator.php:315
 msgid "Scan this with the Google Authenticator app."
 msgstr "Scan dette med Google Authenticator app'en."
 
-#: google-authenticator.php:309
+#: google-authenticator.php:320
 msgid "Enable App password"
 msgstr "Aktiver app kodeord"
 
-#: google-authenticator.php:311
+#: google-authenticator.php:322
 msgid " Enabling an App password will decrease your overall login security."
 msgstr ""
 "Aktiverer du app kodeords featuren, påvirker det din sikkerhed generelt."
 
-#: google-authenticator.php:319
+#: google-authenticator.php:330
 msgid "Create new password"
 msgstr "Opret nyt kodeord"
 
-#: google-authenticator.php:320
+#: google-authenticator.php:331
 msgid ""
 " Password is not stored in cleartext, this is your only chance to see it."
 msgstr ""
 "Kodeordet gemmes ikke i klartekst, dette er din eneste chance for at se det."
 
-#: google-authenticator.php:331
-msgid ""
-"WARNING:\\n\\nShowing the QR code will use the Google Chart API to do so."
-"\\nIf you do not trust Google, please press Cancel and enter the code "
-"manually."
-msgstr ""
-"ADVARSEL:\\n\\nGoogles Chart API anvendes til at vise QR koden.\\nStoler du "
-"ikke på Google, så tryk afbryd og indtast den hemmelige kode manuelt."
-
-#: google-authenticator.php:470
+#: google-authenticator.php:474
 msgid "Hide settings from user"
 msgstr "Skjul indstillinger for bruger"
