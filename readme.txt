@@ -4,7 +4,7 @@ Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=henri
 Tags: authentication,otp,password,security,login,android,iphone,blackberry
 Requires at least: 3.8
 Tested up to: 3.8
-Stable tag: 0.46
+Stable tag: 0.47
 
 Google Authenticator for your WordPress blog.
 
@@ -52,11 +52,19 @@ Yes, each user has his own Google Authenticator settings.
 
 = During installation I forgot the thing about making sure my webhost is capable of providing accurate time information, I'm now unable to login, please help. =
 
-If you have SSH or FTP access to your webhosting account, you can manually delete the plugin from your WordPress installation,   
+If you have SSH or FTP access to your webhosting account, you can manually delete the plugin from your WordPress installation,
+
 just delete the wp-content/plugins/google-authenticator directory, and you'll be able to login using username/password again.
 
 = I don't own a Smartphone, isn't there another way to generate these secret codes ? =
+
 Yes, there is a webbased version here : http://gauth.apps.gbraad.nl/ Github project here : https://github.com/gbraad/html5-google-authenticator
+
+= Any known incompatabilities ? =
+
+Yes, the Man-in-the-middle attack detection code isn't compatible with the test/setup mode in the "Stop spammer registration plugin",
+
+please remember to remove the "Check credentials on all login attempts" checkmark before installing my plugin.
 
 
 == Screenshots ==
@@ -67,6 +75,12 @@ Yes, there is a webbased version here : http://gauth.apps.gbraad.nl/ Github proj
 4. Google Authenticator app on Android
 
 == Changelog ==
+
+= 0.47 =
+* Google chart API replaced with jquery-qrcode
+* QR codes now contain a heading saying WordPress (Feature request by Flemming Mahler)
+* Danish translation & updated .pot file.
+* Plugin now logs login attempts recognized as Man-in-the-middle attacks.
 
 = 0.46 =
 * Man-in-the-middle attack protection added.
@@ -144,3 +158,7 @@ Thanks to:
 [Kaijia Feng](http://www.kaijia.me/) for his Simplified Chinese translation.
 
 [Alex Concha](http://www.buayacorp.com/) for his security tips.
+
+[Jerome Etienne](http://jetienne.com/) for his jquery-qrcode plugin.
+
+[Sébastien Prunier](http://orizhial.com/) for his Spanish and French translation.
