@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Google Authenticator 0.37\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/google-authenticator\n"
 "POT-Creation-Date: 2014-01-11 07:14:22+00:00\n"
-"PO-Revision-Date: 2014-01-12 21:16+0100\n"
+"PO-Revision-Date: 2014-01-12 21:24+0100\n"
 "Last-Translator: Aldo Latino <aldolat@gmail.com>\n"
 "Language-Team: Italian <kde-i18n-it@kde.org>\n"
 "Language: it\n"
@@ -38,7 +38,7 @@ msgid ""
 "<strong>ERROR</strong>: The Google Authenticator code is incorrect or has "
 "expired."
 msgstr ""
-"<strong>ERRORE</strong>: Il codice di Google Authenticator non è corretta o "
+"<strong>ERRORE</strong>: Il codice di Google Authenticator non è corretto o "
 "è scaduto."
 
 #: google-authenticator.php:274
@@ -51,7 +51,7 @@ msgstr "Impostazioni di Google Authenticator"
 
 #: google-authenticator.php:282 google-authenticator.php:481
 msgid "Active"
-msgstr "Attiva"
+msgstr "Attivo"
 
 #: google-authenticator.php:290
 msgid "Relaxed mode"
@@ -139,4 +139,5 @@ msgstr "Henrik Schack"
 #. Author URI of the plugin/theme
 msgid "http://henrik.schack.dk/"
 msgstr "http://henrik.schack.dk/"
+
 
