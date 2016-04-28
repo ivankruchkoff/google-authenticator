@@ -4,9 +4,9 @@ Plugin Name: Google Authenticator
 Plugin URI: http://henrik.schack.dk/google-authenticator-for-wordpress
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Henrik Schack
-Version: 0.47
+Version: 0.48
 Author URI: http://henrik.schack.dk/
-Compatibility: WordPress 3.8
+Compatibility: WordPress 4.5
 Text Domain: google-authenticator
 Domain Path: /lang
 
@@ -193,7 +193,11 @@ function check_otp( $user, $username = '', $password = '' ) {
 
 	// Get information on user, we need this in case an app password has been enabled,
 	// since the $user var only contain an error at this point in the login flow.
-	$user = get_user_by( 'login', $username );
+	if ( get_user_by( 'email', $username ) === false ) {
+		$user = get_user_by( 'login', $username );
+	} else {
+		$user = get_user_by( 'email', $username );
+	}
 
 	// Does the user have the Google Authenticator enabled ?
 	if ( isset( $user->ID ) && trim(get_user_option( 'googleauthenticator_enabled', $user->ID ) ) == 'enabled' ) {
