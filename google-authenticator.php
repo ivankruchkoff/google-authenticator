@@ -169,10 +169,27 @@ function add_setup_page() {
 	add_submenu_page( null, 'Google Authenticator', null, 'read', self::SETUP_PAGE, array( $this, 'setup_page' ) );
 }
 
-function redirect_if_setup_required() {
+/**
+ * Determine if a user needs to setup authy 2fa
+ * @return bool
+ */
+function user_needs_to_setup_google_authenticator() {
 	global $user;
 	$enabled = trim(get_user_option( 'googleauthenticator_enabled', $user->ID ) ) === 'enabled';
-	if ( ! $enabled ) {
+	if ( $enabled ) {
+		return false;
+	}
+	$must_signup = true;
+
+	return apply_filters( 'google_authenticator_needs_setup', $must_signup, $user );
+
+}
+
+/**
+ * Send users to the signup page if they must signup.
+ */
+function redirect_if_setup_required() {
+	if ( $this->user_needs_to_setup_google_authenticator() ) {
 		$screen = get_current_screen();
 		$pagename = 'admin_page_' . self::SETUP_PAGE;
 		if ( is_a( $screen, 'WP_Screen') && in_array_recursive( $screen->id, array( $pagename, 'profile' ) ) ) {
@@ -186,6 +203,10 @@ function redirect_if_setup_required() {
 	}
 }
 
+/**
+ * Save the GA secret if valid totp is provided
+ * @return void|WP_Error
+ */
 function save_submitted_setup_page() {
 	$secret = empty( $_POST['GA_secret'] ) ? false : sanitize_text_field( $_POST['GA_secret']);
 	$otp = empty( $_POST['GA_otp_code'] ) ? false : sanitize_text_field( $_POST['GA_otp_code']);
@@ -205,6 +226,9 @@ function save_submitted_setup_page() {
 	return new WP_Error( 'invalid-otp', esc_html__( "OTP code doesn't match supplied secret, please check you've configured Authenticator correctly.") );
 }
 
+/**
+ * Show the user a success message after we redirect them following successful google authenticator setup
+ */
 function successful_signup_message() {
 	if ( ! empty( $_GET['googleauthenticator'] ) && 'enabled' === $_GET['googleauthenticator'] ) : ?>
 		<div class="updated notice">
@@ -214,6 +238,9 @@ function successful_signup_message() {
 	<?php endif;
 }
 
+/**
+ * Callback function to render the google authenticator setup page
+ */
 function setup_page() {
 	global $user;
 	$enabled = trim(get_user_option( 'googleauthenticator_enabled', $user->ID ) ) === 'enabled';
