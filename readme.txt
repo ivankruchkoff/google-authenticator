@@ -80,7 +80,11 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 
 == Changelog ==
 = 0.49 =
-* More streamlined sign-up flow for users, configuration screen for admins
+* More streamlined sign-up flow for users, configuration screen for admins.
+* Multisite support to either enable 2fa by role on a site, and/or on a network.
+* Added filter google_authenticator_needs_setup to determine if user needs to enable 2fa.
+* Added two part login process that can ask for 2fa code on a second login screen.
+* Fixed a security bug that continued check_otp even if authenticate had already returned an error.
 
 = 0.48 =
 * Security fix / compatability with WordPress 4.5
