@@ -14,7 +14,7 @@ Domain Path: /lang
 
 	Thanks to Ivan Kruchkoff for his UX improvements in user signup.
 	Thanks to Bryan Ruiz for his Base32 encode/decode class, found at php.net.
-	Thanks to Tobias B�thge for his major code rewrite and German translation.
+	Thanks to Tobias Bäthge for his major code rewrite and German translation.
 	Thanks to Pascal de Bruijn for his relaxed mode idea.
 	Thanks to Daniel Werl for his usability tips.
 	Thanks to Dion Hulse for his bugfixes.
@@ -23,7 +23,7 @@ Domain Path: /lang
 	Thanks to Ian Dunn for fixing some depricated function calls.
 	Thanks to Kimmo Suominen for fixing the iPhone description issue.
 	Thanks to Alex Concha for some security tips.
-	Thanks to S�bastien Prunier for his Spanish and French translations.
+	Thanks to Sébastien Prunier for his Spanish and French translations.
 
 ----------------------------------------------------------------------------
 
@@ -62,9 +62,12 @@ function __construct() {
  */
 function init() {
     require_once( 'base32.php' );
-    
-    add_action( 'login_form', array( $this, 'loginform' ) );
-    add_action( 'login_footer', array( $this, 'loginfooter' ) );
+
+    if ( ! $this->is_two_screen_signin_enabled() ) {
+	    add_action( 'login_form', array( $this, 'loginform' ) );
+	    add_action( 'login_footer', array( $this, 'loginfooter' ) );
+    }
+
     add_filter( 'authenticate', array( $this, 'check_otp' ), 50, 3 );
 
     if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
@@ -86,29 +89,40 @@ function init() {
 }
 
 /**
+ * Whether we show Google Auth code on the login screen, or after the user has entered their username and password.
+ *
+ * If it's on a separate screen, it means username / passwords can still be bruteforced, but logins can't occur without 2fa
+ *
+ * @return bool
+ */
+function is_two_screen_signin_enabled() {
+	$two_screen_mfa = is_multisite() ? get_site_option( 'googleauthenticator_two_screen_signin' ) : get_option( 'googleauthenticator_two_screen_signin' );
+	return !! $two_screen_mfa;
+}
+
+/**
  * Check the verification code entered by the user.
  */
-function verify( $secretkey, $thistry, $relaxedmode, $lasttimeslot ) {
 
+function verify( $secretkey, $thistry, $relaxedmode, $lasttimeslot ) {
 	// Did the user enter 6 digits ?
 	if ( strlen( $thistry ) != 6) {
 		return false;
 	} else {
 		$thistry = intval ( $thistry );
 	}
-
 	// If user is running in relaxed mode, we allow more time drifting
-	// �4 min, as opposed to � 30 seconds in normal mode.
+	// ±4 min, as opposed to ± 30 seconds in normal mode.
 	if ( $relaxedmode == 'enabled' ) {
 		$firstcount = -8;
-		$lastcount  =  8; 
+		$lastcount  =  8;
 	} else {
 		$firstcount = -1;
-		$lastcount  =  1; 	
+		$lastcount  =  1;
 	}
-	
+
 	$tm = floor( time() / 30 );
-	
+
 	$secretkey=Base32::decode($secretkey);
 	// Keys from 30 seconds before and after are valid aswell.
 	for ($i=$firstcount; $i<=$lastcount; $i++) {
@@ -356,6 +370,12 @@ function save_submitted_admin_setup_page( $is_network ) {
 			$network_settings_only = array_key_exists( 'network_settings_only', $_POST );
 			update_site_option( 'googleauthenticator_network_only', $network_settings_only );
 		}
+		$two_screen_mfa = array_key_exists( 'two_screen_approach', $_POST ) && 'true' === $_POST[ 'two_screen_approach' ];
+		if ( is_multisite() && $is_network ) {
+			update_site_option( 'googleauthenticator_two_screen_signin', $two_screen_mfa );
+		} elseif ( ! $is_network ) {
+			update_option( 'googleauthenticator_two_screen_signin', $two_screen_mfa );
+		}
 		$roles = isset( $_POST['roles'] ) ? (array) $_POST['roles'] : array();
 		$roles = array_map( 'sanitize_text_field', $roles );
 
@@ -406,6 +426,16 @@ function common_admin_setup_page( $is_network = false ) {
 					</label>
 				</p>
 			<?php endif; ?>
+			<?php if ( is_multisite() && $is_network || ! is_multisite() ): ?>
+				<?php $two_screen_mfa = is_multisite() ? get_site_option( 'googleauthenticator_two_screen_signin' ) : get_option( 'googleauthenticator_two_screen_signin' ); ?>
+			   <h2><?php esc_html_e( 'Two Screen Signin', 'google-authenticator' ); ?></h2>
+				<p>
+					<label>
+						<input name="two_screen_approach" type="checkbox" value="true" <?php checked( $two_screen_mfa ); ?>>
+						<?php esc_html_e( 'Ask for authenticator code on secondary login screen', 'google-authenticator' ); ?>
+					</label>
+				</p>
+			<?php endif; ?>
 			<h2><?php esc_html_e( 'Roles requiring Google Authenticator Enabled', 'google-authenticator' ); ?></h2>
 			<?php foreach ($roles as $role_key => $role) {
 				$this->show_role_checkbox( $role_key, $role, $is_network );
@@ -420,6 +450,7 @@ function common_admin_setup_page( $is_network = false ) {
 				<?php endif;
 			}
 			?>
+
 		</form>
 	</div>
 	<?php
@@ -487,7 +518,7 @@ function network_admin_setup_page() {
 function loginform() {
     echo "\t<p>\n";
     echo "\t\t<label title=\"".__('If you don\'t have Google Authenticator enabled for your WordPress account, leave this field empty.','google-authenticator')."\">".__('Google Authenticator code','google-authenticator')."<span id=\"google-auth-info\"></span><br />\n";
-    echo "\t\t<input type=\"text\" name=\"googleotp\" id=\"user_email\" class=\"input\" value=\"\" size=\"20\" style=\"ime-mode: inactive;\" /></label>\n";
+    echo "\t\t<input type=\"text\" name=\"googleotp\" id=\"googleotp\" class=\"input\" value=\"\" size=\"20\" style=\"ime-mode: inactive;\" /></label>\n";
     echo "\t</p>\n";
 }
 
@@ -505,10 +536,14 @@ function loginfooter() {
 /**
  * Login form handling.
  * Check Google Authenticator verification code, if user has been setup to do so.
- * @param wordpressuser
+ * @param wordpressuser / WP_Error
  * @return user/loginstatus
  */
 function check_otp( $user, $username = '', $password = '' ) {
+	// If a failure has already occurred somewhere along the way, pass it along rather than continuing with auth.
+	if ( is_wp_error( $user ) ) {
+		return $user;
+	}
 	// Store result of loginprocess, so far.
 	$userstate = $user;
 
@@ -558,13 +593,49 @@ function check_otp( $user, $username = '', $password = '' ) {
 					return new WP_Error( 'invalid_google_authenticator_password', __( '<strong>ERROR</strong>: The Google Authenticator password is incorrect.', 'google-authenticator' ) );
 				} 		 
 			} else {
-				return new WP_Error( 'invalid_google_authenticator_token', __( '<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired.', 'google-authenticator' ) );
-			}	
+				if ( ! $this->is_two_screen_signin_enabled() ) {
+					return new WP_Error( 'invalid_google_authenticator_token', __( '<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired.', 'google-authenticator' ) );
+				} else {
+					wp_logout();
+					$this->secondary_login_screen();
+					exit;
+				}
+			}
 		}
 	}
 	// Google Authenticator isn't enabled for this account,
 	// just resume normal authentication.
 	return $userstate;
+}
+
+function secondary_login_screen( $redirect_to ) {
+	$redirect_to = isset( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : admin_url();
+	login_header( 'Secondary Login Screen' );
+	if ( array_key_exists( 'googleotp', $_REQUEST ) ) {
+		if ( 0 === strlen( $_REQUEST[ 'googleotp'] ) ) {
+			$error_message = __( '<strong>ERROR</strong>: The Google Authenticator code is missing.', 'google-authenticator' );
+		} else {
+			$error_message = __( '<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired.', 'google-authenticator' );
+		}
+		echo '<div id="login_error">' . $error_message . '</div>';
+	}?>
+	<form name="loginform" id="loginform" action="<?php echo esc_url( site_url( 'wp-login.php', 'login_post' ) ); ?>" method="post">
+		<input type="hidden" name="log" value="<?php echo esc_attr( $_REQUEST['log'] ); ?>" />
+		<input type="hidden" name="pwd" value="<?php echo esc_attr( $_REQUEST['pwd'] ); ?>" />
+		<input type="hidden" name="wp-submit" value="<?php echo esc_attr( $_REQUEST['wp-submit'] ); ?>" />
+		<?php if ( array_key_exists( 'rememberme', $_REQUEST ) && 'forever' === $_REQUEST[ 'rememberme']): ?>
+				<input name="rememberme" type="hidden" id="rememberme" value="forever" />
+		<?php endif; ?>
+		<?php $this->loginform(); ?>
+		<p><?php esc_html_e( 'Please enter the Google Authenticator code using the app on your device.', 'google-authenticator' ); ?></p>
+		<p class="submit">
+			<input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large" value="<?php esc_attr_e('Log In'); ?>" />
+			<input type="hidden" name="redirect_to" value="<?php echo esc_attr($redirect_to); ?>" />
+			<input type="hidden" name="testcookie" value="1" />
+		</p>
+	</form>
+	<?php
+	login_footer();
 }
 
 
@@ -604,9 +675,9 @@ function profile_personal_options( $args = array() ) {
 		$GA_password = "XXXX XXXX XXXX XXXX";
 	}
 
-	// In case the user has no secret ready (new install), we create one.
+	// In case the user has no secret ready (new install), we create one. or use the one they just posted
 	if ( '' == $GA_secret ) {
-		$GA_secret = $this->create_secret();
+		$GA_secret = array_key_exists( 'GA_secret', $_REQUEST ) ? sanitize_text_field( $_REQUEST[ 'GA_secret' ] ) : $this->create_secret();
 	}
 	
 	if ( '' == $GA_description ) {
@@ -912,4 +983,4 @@ function ajax_callback() {
 } // end class
 
 $google_authenticator = new GoogleAuthenticator;
-?>
+
