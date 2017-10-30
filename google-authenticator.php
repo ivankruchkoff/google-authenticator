@@ -373,13 +373,19 @@ function save_submitted_admin_setup_page( $is_network ) {
 	if ( wp_verify_nonce( $nonce, 'googleauthenticator' ) ) {
 		if ( $is_network ) {
 			$network_settings_only = array_key_exists( 'network_settings_only', $_POST );
-			update_site_option( 'googleauthenticator_network_only', $network_settings_only );
+			if ( current_user_can( 'manage_network_options' ) ) {
+				update_site_option( 'googleauthenticator_network_only', $network_settings_only );
+			}
 		}
 		$two_screen_mfa = array_key_exists( 'two_screen_approach', $_POST ) && 'true' === $_POST[ 'two_screen_approach' ];
 		if ( is_multisite() && $is_network ) {
-			update_site_option( 'googleauthenticator_two_screen_signin', $two_screen_mfa );
+			if ( current_user_can( 'manage_network_options' ) ) {
+				update_site_option( 'googleauthenticator_two_screen_signin', $two_screen_mfa );
+			}
 		} elseif ( ! $is_network ) {
-			update_option( 'googleauthenticator_two_screen_signin', $two_screen_mfa );
+			if ( current_user_can( 'manage_options' ) ) {
+				update_option( 'googleauthenticator_two_screen_signin', $two_screen_mfa );
+			}
 		}
 		$roles = isset( $_POST['roles'] ) ? (array) $_POST['roles'] : array();
 		$roles = array_map( 'sanitize_text_field', $roles );
