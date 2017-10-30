@@ -279,7 +279,7 @@ function save_submitted_setup_page() {
 function successful_signup_message() {
 	if ( ! empty( $_GET['googleauthenticator'] ) && 'enabled' === $_GET['googleauthenticator'] ) : ?>
 		<div class="updated notice">
-			<p><?php esc_html_e( 'Congratulations, you have successfully enabled Google Authenticator for your account ' ); ?></p>
+			<p><?php esc_html_e( 'Congratulations, you have successfully enabled Google Authenticator for your account', 'google-authenticator' ); ?></p>
 		</div>
 
 	<?php endif;
