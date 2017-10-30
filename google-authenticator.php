@@ -407,7 +407,6 @@ function save_submitted_admin_setup_page( $is_network ) {
  * Callback function to render the google authenticator setup page
  */
 function common_admin_setup_page( $is_network = false ) {
-	$user = wp_get_current_user();
 	if ( $is_network ) {
 		$site_ids = get_sites( 'fields=ids' );
 		$roles = get_editable_roles();
@@ -419,7 +418,7 @@ function common_admin_setup_page( $is_network = false ) {
 		$edit_enabled = true;
 	} else {
 		$roles = get_editable_roles();
-		$edit_enabled = is_multisite() ? '1' !== get_site_option( 'googleauthenticator_network_only') : true;
+		$edit_enabled = is_multisite() ? boolval( get_site_option( 'googleauthenticator_network_only') ) : true;
 	}
 	$is_updated = $this->save_submitted_admin_setup_page( $is_network );
 	?>
@@ -427,9 +426,9 @@ function common_admin_setup_page( $is_network = false ) {
 		<h1><?php esc_html_e( 'Google Authenticator Settings', 'google-authenticator' ); ?></h1>
 		<?php if ( $is_updated ): ?>
 			<?php if ( $is_network ): ?>
-				<div class="error notice"><p><?php esc_html_e( 'Successfullly saved your settings for the network', 'google-authenticator' ); ?></p></div>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Successfullly saved your settings for the network', 'google-authenticator' ); ?></p></div>
 			<?php else: ?>
-				<div class="error notice"><p><?php esc_html_e( 'Successfullly saved your settings for the site', 'google-authenticator' ); ?></p></div>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Successfullly saved your settings for the site', 'google-authenticator' ); ?></p></div>
 			<?php endif; ?>
 		<?php endif; ?>
 		<form method="post">
@@ -480,7 +479,7 @@ function common_admin_setup_page( $is_network = false ) {
  */
 function show_role_checkbox( $role_key, $role, $is_network ) {
 	$network_roles = get_site_option( 'googleauthenticator_mandatory_mfa_roles', array() );
-	$network_only = is_multisite() &&  '1' === get_site_option( 'googleauthenticator_network_only' );
+	$network_only = is_multisite() && boolval( get_site_option( 'googleauthenticator_network_only' ) );
 	$roles = get_option( 'googleauthenticator_mandatory_mfa_roles', array() );
 	if ( $network_only ) {
 		$checked = in_array( $role_key, $network_roles );
