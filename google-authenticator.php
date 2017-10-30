@@ -738,7 +738,7 @@ function profile_personal_options( $args = array() ) {
 	echo "<tr>\n";
 	echo "<th><label for=\"GA_secret\">".__('Secret','google-authenticator')."</label></th>\n";
 	echo "<td>\n";
-	echo "<input name=\"GA_secret\" id=\"GA_secret\" value=\"" . esc_attr( $GA_secret) . "}\" readonly=\"readonly\"  type=\"text\" size=\"25\" />";
+	echo "<input name=\"GA_secret\" id=\"GA_secret\" value=\"" . esc_attr( $GA_secret) . "\" readonly=\"readonly\"  type=\"text\" size=\"25\" />";
 	if ( $args['show_secret_buttons']) {
 		echo "<input name=\"GA_newsecret\" id=\"GA_newsecret\" value=\"".__("Create new secret",'google-authenticator')."\"   type=\"button\" class=\"button\" />";
 		echo "<input name=\"show_qr\" id=\"show_qr\" value=\"".__("Show/Hide QR code",'google-authenticator')."\"   type=\"button\" class=\"button\" onclick=\"ShowOrHideQRCode();\" />";
