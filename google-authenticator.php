@@ -48,6 +48,7 @@ class GoogleAuthenticator {
 
 static $instance; // to store a reference to the plugin, allows other plugins to remove actions
 const SETUP_PAGE = 'google_authenticator_user_page';
+protected $error_message = null;
 
 /**
  * Constructor, entry point of the plugin
@@ -84,6 +85,7 @@ function init() {
 	add_action( 'network_admin_menu', array ( $this, 'add_pages' ) );
 	add_action( 'current_screen', array ( $this, 'redirect_if_setup_required' ) );
 	add_action( 'admin_notices', array ( $this, 'successful_signup_message' ) );
+	add_action( 'load-admin_page_google_authenticator_user_page', array( $this, 'save_submitted_setup_page' ) );
 
     load_plugin_textdomain( 'google-authenticator', false, basename( dirname( __FILE__ ) ) . '/lang' );
 }
@@ -247,9 +249,10 @@ function redirect_if_setup_required() {
 
 /**
  * Save the GA secret if valid totp is provided
- * @return void|WP_Error
+ * @return void
  */
 function save_submitted_setup_page() {
+	$this->error_message = null; // Reset a previous error message if it was set
 	$user = wp_get_current_user();
 	$secret = empty( $_POST['GA_secret'] ) ? false : sanitize_text_field( $_POST['GA_secret']);
 	$otp = empty( $_POST['GA_otp_code'] ) ? false : sanitize_text_field( $_POST['GA_otp_code']);
@@ -267,7 +270,7 @@ function save_submitted_setup_page() {
 		exit;
 	};
 
-	return new WP_Error( 'invalid-otp', esc_html__( "OTP code doesn't match supplied secret, please check you've configured Authenticator correctly.", 'google-authenticator' ) );
+	$this->error_message = new WP_Error( 'invalid-otp', esc_html__( "OTP code doesn't match supplied secret, please check you've configured Authenticator correctly.", 'google-authenticator' ) );
 }
 
 /**
@@ -293,7 +296,7 @@ function user_setup_page() {
 		wp_redirect( $location );
 		exit;
 	}
-	$error = $this->save_submitted_setup_page();
+	$error = $this->error_message;
 
 	$app_links = array(
 		array(
