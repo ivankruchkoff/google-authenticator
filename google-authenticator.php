@@ -184,7 +184,7 @@ function add_qrcode_script() {
  */
 function add_pages() {
 	// No menu entry for this page
-	add_submenu_page( null, 'Google Authenticator', null, 'read', self::SETUP_PAGE, array( $this, 'user_setup_page' ) );
+	add_submenu_page( null, esc_html__( 'Google Authenticator', 'google-authenticator' ), null, 'read', self::SETUP_PAGE, array( $this, 'user_setup_page' ) );
 
 	// Site admin screen
 	add_submenu_page( 'options-general.php', esc_html__( 'Google Authenticator', 'google-authenticator' ), esc_html__( 'Google Authenticator', 'google-authenticator' ), 'manage_options', 'google_authenticator', array( $this, 'admin_setup_page' ) );
@@ -250,13 +250,15 @@ function redirect_if_setup_required() {
  * @return void|WP_Error
  */
 function save_submitted_setup_page() {
+	$user = wp_get_current_user();
 	$secret = empty( $_POST['GA_secret'] ) ? false : sanitize_text_field( $_POST['GA_secret']);
 	$otp = empty( $_POST['GA_otp_code'] ) ? false : sanitize_text_field( $_POST['GA_otp_code']);
 	if ( ! strlen( $secret ) || ! strlen( $otp ) ) {
 		return;
 	}
-	if ( $timeslot = $this->verify( $secret, $otp ) ) {
-		global $user;
+	$relaxed_mode = trim( get_user_option( 'googleauthenticator_relaxedmode', $user->ID ) );
+	$relaxed_mode = 'enabled' === $relaxed_mode ? 'enabled' : 'disabled';
+	if ( $timeslot = $this->verify( $secret, $otp, $relaxed_mode, '' ) ) {
 		update_user_option( $user->ID, 'googleauthenticator_lasttimeslot', $timeslot, true );
 		update_user_option( $user->ID, 'googleauthenticator_secret', $secret, true );
 		update_user_option( $user->ID, 'googleauthenticator_enabled', 'enabled', true );
@@ -265,7 +267,7 @@ function save_submitted_setup_page() {
 		exit;
 	};
 
-	return new WP_Error( 'invalid-otp', esc_html__( "OTP code doesn't match supplied secret, please check you've configured Authenticator correctly.") );
+	return new WP_Error( 'invalid-otp', esc_html__( "OTP code doesn't match supplied secret, please check you've configured Authenticator correctly.", 'google-authenticator' ) );
 }
 
 /**
@@ -388,6 +390,7 @@ function save_submitted_admin_setup_page( $is_network ) {
 				update_option( 'googleauthenticator_mandatory_mfa_roles', $roles );
 			}
 		}
+		return true;
 	}
 }
 
@@ -409,12 +412,16 @@ function common_admin_setup_page( $is_network = false ) {
 		$roles = get_editable_roles();
 		$edit_enabled = is_multisite() ? '1' !== get_site_option( 'googleauthenticator_network_only') : true;
 	}
-	$errors = $this->save_submitted_admin_setup_page( $is_network );
+	$is_updated = $this->save_submitted_admin_setup_page( $is_network );
 	?>
 	<div class="wrap">
 		<h1><?php esc_html_e( 'Google Authenticator Settings', 'google-authenticator' ); ?></h1>
-		<?php if (false ): ?>
-			<div class="error notice"><p><?php esc_html_e( 'foo' ); ?></p></div>
+		<?php if ( $is_updated ): ?>
+			<?php if ( $is_network ): ?>
+				<div class="error notice"><p><?php esc_html_e( 'Successfullly saved your settings for the network', 'google-authenticator' ); ?></p></div>
+			<?php else: ?>
+				<div class="error notice"><p><?php esc_html_e( 'Successfullly saved your settings for the site', 'google-authenticator' ); ?></p></div>
+			<?php endif; ?>
 		<?php endif; ?>
 		<form method="post">
 			<?php if ( $is_network ): ?>
@@ -494,7 +501,7 @@ function show_role_checkbox( $role_key, $role, $is_network ) {
 
 	$readonly = $readonly ? ' readonly="readonly"' : '';
 	?>
-	<p><label><input name="roles[]" type="checkbox"<?php echo $readonly . checked( $checked, true, false ); ?>value="<?php esc_attr_e( $role_key ); ?>"><strong><?php esc_html_e( $role[ 'name' ] ); ?></strong></label> <?php echo $readonly_label; ?></p>
+	<p><label><input name="roles[]" type="checkbox"<?php echo esc_html( $readonly ) . checked( $checked, true, false ); ?>value="<?php esc_attr_e( $role_key ); ?>"><strong><?php esc_html_e( $role[ 'name' ] ); ?></strong></label> <?php echo $readonly_label; ?></p>
 	<?php
 }
 
@@ -608,9 +615,9 @@ function check_otp( $user, $username = '', $password = '' ) {
 	return $userstate;
 }
 
-function secondary_login_screen( $redirect_to ) {
+function secondary_login_screen() {
 	$redirect_to = isset( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : admin_url();
-	login_header( 'Secondary Login Screen' );
+	login_header( esc_html__('Secondary Login Screen', 'google-authenticator' ) );
 	if ( array_key_exists( 'googleotp', $_REQUEST ) ) {
 		if ( 0 === strlen( $_REQUEST[ 'googleotp'] ) ) {
 			$error_message = __( '<strong>ERROR</strong>: The Google Authenticator code is missing.', 'google-authenticator' );
@@ -715,14 +722,14 @@ function profile_personal_options( $args = array() ) {
 
 	$show_description_style = $args['show_description'] ? '' : 'display:none';
 	echo "<tr style=\"{$show_description_style}\">\n";
-	echo "<th><label for=\"GA_description\">" . __( 'Description', 'google-authenticator' ) . "</label></th>\n";
+	echo "<th><label for=\"GA_description\">" . esc_html__( 'Description', 'google-authenticator' ) . "</label></th>\n";
 	echo "<td><input name=\"GA_description\" id=\"GA_description\" value=\"{$GA_description}\"  type=\"text\" size=\"25\" /><span class=\"description\">" . __( ' Description that you\'ll see in the Google Authenticator app on your phone.', 'google-authenticator' ) . "</span><br /></td>\n";
 	echo "</tr>\n";
 
 	echo "<tr>\n";
 	echo "<th><label for=\"GA_secret\">".__('Secret','google-authenticator')."</label></th>\n";
 	echo "<td>\n";
-	echo "<input name=\"GA_secret\" id=\"GA_secret\" value=\"{$GA_secret}\" readonly=\"readonly\"  type=\"text\" size=\"25\" />";
+	echo "<input name=\"GA_secret\" id=\"GA_secret\" value=\"" . esc_attr( $GA_secret) . "}\" readonly=\"readonly\"  type=\"text\" size=\"25\" />";
 	if ( $args['show_secret_buttons']) {
 		echo "<input name=\"GA_newsecret\" id=\"GA_newsecret\" value=\"".__("Create new secret",'google-authenticator')."\"   type=\"button\" class=\"button\" />";
 		echo "<input name=\"show_qr\" id=\"show_qr\" value=\"".__("Show/Hide QR code",'google-authenticator')."\"   type=\"button\" class=\"button\" onclick=\"ShowOrHideQRCode();\" />";
