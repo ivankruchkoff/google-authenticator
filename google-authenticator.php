@@ -6,7 +6,7 @@ Description: Two-Factor Authentication for WordPress using the Android/iPhone/Bl
 Author: Henrik Schack
 Version: 0.49
 Author URI: http://henrik.schack.dk/
-Compatibility: WordPress 4.8.2
+Compatibility: WordPress 5.1
 Text Domain: google-authenticator
 Domain Path: /lang
 
