@@ -81,8 +81,8 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 
 == Changelog ==
 = 0.50 =
-* New maintainer
-* Code remediated to meet WP standards
+* New maintainer ivankk
+* Conditionally include base32 class
 
 = 0.49 =
 * More streamlined sign-up flow for users, configuration screen for admins.
