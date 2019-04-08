@@ -1,11 +1,17 @@
 # Google Authenticator #
-Contributors: Henrik.Schack
-Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=henrik%40schack%2edk&lc=US&item_name=Google%20Authenticator&item_number=Google%20Authenticator&no_shipping=0&no_note=1&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8
+Contributors: ivankk
+
 Tags: authentication, otp, password, security, login, android, iphone, blackberry
 
 Requires at least: 4.5
+
 Tested up to: 5.1
-Stable tag: 0.49
+
+Stable tag: 0.50
+
+License: GPLv2 or later
+
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Google Authenticator for your WordPress blog.
 
@@ -56,9 +62,9 @@ If you have SSH or FTP access to your webhosting account, you can manually delet
 
 **I don't own a Smartphone, isn't there another way to generate these secret codes?**
 
-Yes, there is a webbased version here : http://gauth.apps.gbraad.nl/  
+Yes, there is a webbased version here : https://gauth.apps.gbraad.nl/
 
-Github project here: https://github.com/gbraad/html5-google-authenticator
+Github project here: https://github.com/gbraad/gauth
 
 **Can I create backupcodes?**
 
@@ -158,6 +164,8 @@ Yes, the Man-in-the-middle attack/replay detection code isn't compatible with th
 ## Credits ##
 
 Thanks to:
+
+[Henrik.Schack](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=henrik%40schack%2edk&lc=US&item_name=Google%20Authenticator&item_number=Google%20Authenticator&no_shipping=0&no_note=1&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8) for writing/maintaining versions 0.20 through 0.48
 
 [Tobias Bäthge](http://tobias.baethge.com/) for his code rewrite and German translation.
 

@@ -1,17 +1,18 @@
 <?php
 /*
 Plugin Name: Google Authenticator
-Plugin URI: http://henrik.schack.dk/google-authenticator-for-wordpress
+Plugin URI: https://github.com/ivankruchkoff/google-authenticator
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
-Author: Henrik Schack
-Version: 0.49
-Author URI: http://henrik.schack.dk/
+Author: Ivan Kruchkoff
+Version: 0.50
+Author URI: https://github.com/ivankruchkoff
 Compatibility: WordPress 5.1
 Text Domain: google-authenticator
 Domain Path: /lang
 
 ----------------------------------------------------------------------------
 
+	Thanks to Henrik Schack for creating / maintaining versions 0.20 to 0.48
 	Thanks to Ivan Kruchkoff for his UX improvements in user signup.
 	Thanks to Bryan Ruiz for his Base32 encode/decode class, found at php.net.
 	Thanks to Tobias Bäthge for his major code rewrite and German translation.
@@ -27,21 +28,25 @@ Domain Path: /lang
 
 ----------------------------------------------------------------------------
 
-    Copyright 2013  Henrik Schack  (email : henrik@schack.dk)
+	Versions from 0.49 onwards
+	Copyright 2019 Ivan Kruchkoff
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	Versions up to and including 0.48
+	Copyright 2013 Henrik Schack  (email : henrik@schack.dk)
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 class GoogleAuthenticator {
@@ -62,7 +67,9 @@ function __construct() {
  * Initialization, Hooks, and localization
  */
 function init() {
-    require_once( 'base32.php' );
+	if ( ! class_exists( 'Base32' ) ) {
+		require_once( 'base32.php' );
+	}
 
     if ( ! $this->is_two_screen_signin_enabled() ) {
 	    add_action( 'login_form', array( $this, 'loginform' ) );
