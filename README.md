@@ -86,6 +86,9 @@ Yes, the Man-in-the-middle attack/replay detection code isn't compatible with th
 4. Google Authenticator app on Android
 
 ## Changelog ##
+**0.51**
+* Fix a regression that broke app passwords
+
 **0.50**
 * New maintainer ivankk
 * Conditionally include base32 class

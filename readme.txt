@@ -3,7 +3,7 @@ Contributors: ivankk
 Tags: authentication,otp,password,security,login,android,iphone,blackberry
 Requires at least: 4.5
 Tested up to: 5.1
-Stable tag: 0.50
+Stable tag: 0.51
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,9 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 4. Google Authenticator app on Android
 
 == Changelog ==
+= 0.51 =
+* Fix a regression that broke app passwords
+
 = 0.50 =
 * New maintainer ivankk
 * Conditionally include base32 class
