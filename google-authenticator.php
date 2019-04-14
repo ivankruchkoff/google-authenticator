@@ -562,10 +562,6 @@ function loginfooter() {
  * @return user/loginstatus
  */
 function check_otp( $user, $username = '', $password = '' ) {
-	// If a failure has already occurred somewhere along the way, pass it along rather than continuing with auth.
-	if ( is_wp_error( $user ) ) {
-		return $user;
-	}
 	// Store result of loginprocess, so far.
 	$userstate = $user;
 
