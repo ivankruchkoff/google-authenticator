@@ -312,7 +312,7 @@ function user_setup_page() {
 		),
 		array(
 			'text' => __( 'iOS: Google Authenticator', 'google-authenticator' ),
-			'link' => 'https://itunes.apple.com/us/app/google-authenticator/id388497605',
+			'link' => 'https://itunes.apple.com/app/google-authenticator/id388497605',
 		),
 		array(
 			'text' => __( 'Android: Authy', 'google-authenticator' ),
