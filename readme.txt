@@ -166,6 +166,8 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 
 Thanks to:
 
+[Guido Schalkx](https://www.guidoschalkx.com/) for the Dutch Translation.
+
 [Henrik.Schack](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=henrik%40schack%2edk&lc=US&item_name=Google%20Authenticator&item_number=Google%20Authenticator&no_shipping=0&no_note=1&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8) for writing/maintaining versions 0.20 through 0.48
 
 [Tobias Bäthge](http://tobias.baethge.com/) for his code rewrite and German translation.
