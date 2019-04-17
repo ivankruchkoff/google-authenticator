@@ -312,15 +312,15 @@ function user_setup_page() {
 		),
 		array(
 			'text' => __( 'iOS: Google Authenticator', 'google-authenticator' ),
-			'link' => 'https://itunes.apple.com/app/authy/id494168017',
+			'link' => 'https://itunes.apple.com/app/google-authenticator/id388497605',
 		),
 		array(
 			'text' => __( 'Android: Authy', 'google-authenticator' ),
-			'link' => 'https://itunes.apple.com/app/authy/id494168017',
+			'link' => 'https://play.google.com/store/apps/details?id=com.authy.authy',
 		),
 		array(
 			'text' => __( 'Android: Google Authenticator', 'google-authenticator' ),
-			'link' => 'https://itunes.apple.com/app/authy/id494168017',
+			'link' => 'https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2',
 		),
 		array(
 			'text' => __( 'Windows Phone', 'google-authenticator' ),
@@ -540,7 +540,7 @@ function network_admin_setup_page() {
 function loginform() {
     echo "\t<p>\n";
     echo "\t\t<label title=\"".__('If you don\'t have Google Authenticator enabled for your WordPress account, leave this field empty.','google-authenticator')."\">".__('Google Authenticator code','google-authenticator')."<span id=\"google-auth-info\"></span><br />\n";
-    echo "\t\t<input type=\"text\" name=\"googleotp\" id=\"googleotp\" class=\"input\" value=\"\" size=\"20\" style=\"ime-mode: inactive;\" /></label>\n";
+    echo "\t\t<input type=\"text\" name=\"googleotp\" id=\"googleotp\" class=\"input\" value=\"\" size=\"20\" style=\"ime-mode: inactive;\" autocomplete=\"off\" /></label>\n";
     echo "\t</p>\n";
 }
 
