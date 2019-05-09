@@ -4,14 +4,17 @@ Plugin Name: Google Authenticator
 Plugin URI: https://github.com/ivankruchkoff/google-authenticator
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Ivan Kruchkoff
-Version: 0.51
+Version: 0.52
 Author URI: https://github.com/ivankruchkoff
-Compatibility: WordPress 5.1
+Compatibility: WordPress 5.2
 Text Domain: google-authenticator
 Domain Path: /lang
 
 ----------------------------------------------------------------------------
 
+
+    Thanks to Fabio Zumbi for Portuguese translation.
+    Thanks to Guido Schalkx for the Dutch translation.
 	Thanks to Henrik Schack for creating / maintaining versions 0.20 to 0.48
 	Thanks to Ivan Kruchkoff for his UX improvements in user signup.
 	Thanks to Bryan Ruiz for his Base32 encode/decode class, found at php.net.
