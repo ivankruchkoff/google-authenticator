@@ -5,9 +5,9 @@ Tags: authentication, otp, password, security, login, android, iphone, blackberr
 
 Requires at least: 4.5
 
-Tested up to: 5.1
+Tested up to: 5.2
 
-Stable tag: 0.50
+Stable tag: 0.52
 
 License: GPLv2 or later
 
@@ -86,6 +86,10 @@ Yes, the Man-in-the-middle attack/replay detection code isn't compatible with th
 4. Google Authenticator app on Android
 
 ## Changelog ##
+**0.52**
+* Add a Dutch translation
+* Add a Portuguese translation
+
 **0.51**
 * Fix a regression that broke app passwords
 
@@ -121,7 +125,6 @@ Yes, the Man-in-the-middle attack/replay detection code isn't compatible with th
 * Sanitize description field input.
 * App password hash function switched to one that doesn't have rainbow tables available.
 * PHP notices occurring during app password login removed.
-
 
 **0.44** 
 * Installation/FAQ section updated.
@@ -171,6 +174,8 @@ Yes, the Man-in-the-middle attack/replay detection code isn't compatible with th
 ## Credits ##
 
 Thanks to:
+
+[Fabio Zumbi](https://github.com/FabioZumbi12) for the Portuguese translation
 
 [Guido Schalkx](https://www.guidoschalkx.com/) for the Dutch Translation.
 

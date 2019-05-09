@@ -2,8 +2,8 @@
 Contributors: ivankk
 Tags: authentication,otp,password,security,login,android,iphone,blackberry
 Requires at least: 4.5
-Tested up to: 5.1
-Stable tag: 0.51
+Tested up to: 5.2
+Stable tag: 0.52
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,10 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 4. Google Authenticator app on Android
 
 == Changelog ==
+= 0.52 =
+* Add a Dutch translation
+* Add a Portuguese translation
+
 = 0.51 =
 * Fix a regression that broke app passwords
 
@@ -115,7 +119,6 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 * Sanitize description field input.
 * App password hash function switched to one that doesn't have rainbow tables available.
 * PHP notices occurring during app password login removed.
-
 
 = 0.44 =  
 * Installation/FAQ section updated.
@@ -166,7 +169,9 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 
 Thanks to:
 
-[Guido Schalkx](https://www.guidoschalkx.com/) for the Dutch Translation.
+[Fabio Zumbi](https://github.com/FabioZumbi12) for the Portuguese translation
+
+[Guido Schalkx](https://www.guidoschalkx.com/) for the Dutch translation.
 
 [Henrik.Schack](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=henrik%40schack%2edk&lc=US&item_name=Google%20Authenticator&item_number=Google%20Authenticator&no_shipping=0&no_note=1&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8) for writing/maintaining versions 0.20 through 0.48
 
