@@ -545,6 +545,11 @@ function loginform() {
     echo "\t\t<label title=\"".__('If you don\'t have Google Authenticator enabled for your WordPress account, leave this field empty.','google-authenticator')."\">".__('Google Authenticator code','google-authenticator')."<span id=\"google-auth-info\"></span><br />\n";
     echo "\t\t<input type=\"text\" name=\"googleotp\" id=\"googleotp\" class=\"input\" value=\"\" size=\"20\" style=\"ime-mode: inactive;\" autocomplete=\"off\" /></label>\n";
     echo "\t</p>\n";
+
+    // Focus the input field on page load
+    echo "\t<script type=\"text/javascript\">\n";
+    echo "\t\tfunction myFunction() { document.getElementById(\"googleotp\").focus(); }\n";
+    echo "\t</script>\n";
 }
 
 /**
