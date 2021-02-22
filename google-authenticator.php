@@ -218,6 +218,9 @@ function user_needs_to_setup_google_authenticator() {
 	}
 
 	$must_signup = false;
+	if ( ! count( $user->roles ) ) {
+		return false;
+	}
 	$user_role = $user->roles[0];
 	$check_single_site_admin_options = true;
 
