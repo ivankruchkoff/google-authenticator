@@ -708,7 +708,7 @@ function profile_personal_options( $args = array() ) {
 	if ( '' == $GA_description ) {
 		// Super admins and users with accounts on more than one site get the network name as the helpful name,
 		// everyone else gets the site that they're on
-		if ( is_multisite() && ( 1 < count( get_blogs_of_user( $user_id )  || is_super_admin() ) ) ) {
+		if ( is_multisite() && ( 1 < count( get_blogs_of_user( $user_id ) ) || is_super_admin() ) ) {
 			$GA_description = sanitize_text_field( get_blog_details( get_network()->id )->blogname );
 		} else {
 			$GA_description = sanitize_text_field( get_bloginfo( 'name' ) );

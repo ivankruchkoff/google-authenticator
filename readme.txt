@@ -2,8 +2,8 @@
 Contributors: ivankk
 Tags: authentication,otp,password,security,login,android,iphone,blackberry
 Requires at least: 4.5
-Tested up to: 5.6
-Stable tag: 0.53
+Tested up to: 6.0
+Stable tag: 0.54
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,9 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 4. Google Authenticator app on Android
 
 == Changelog ==
+= 0.54 =
+* Fixed a bug in multisite.
+
 = 0.53 =
 * Add a Polish translation
 
@@ -171,6 +174,8 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 == Credits ==
 
 Thanks to:
+
+[Oleksiy](https://profiles.wordpress.org/evinak/) for a bugfix in multisite.
 
 [Paweł Nowacki](https://github.com/pancek) for the Polish translation
 
