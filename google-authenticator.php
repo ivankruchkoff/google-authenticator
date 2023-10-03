@@ -197,7 +197,7 @@ function add_qrcode_script() {
  */
 function add_pages() {
 	// No menu entry for this page
-	add_submenu_page( null, esc_html__( 'Google Authenticator', 'google-authenticator' ), null, 'read', self::SETUP_PAGE, array( $this, 'user_setup_page' ) );
+	add_submenu_page( '', esc_html__( 'Google Authenticator', 'google-authenticator' ), null, 'read', self::SETUP_PAGE, array( $this, 'user_setup_page' ) );
 
 	// Site admin screen
 	add_submenu_page( 'options-general.php', esc_html__( 'Google Authenticator', 'google-authenticator' ), esc_html__( 'Google Authenticator', 'google-authenticator' ), 'manage_options', 'google_authenticator', array( $this, 'admin_setup_page' ) );
@@ -380,7 +380,7 @@ function user_setup_page() {
  * @param $is_network
  */
 function save_submitted_admin_setup_page( $is_network ) {
-	$nonce = filter_input( INPUT_POST, 'googleauthenticator', FILTER_SANITIZE_STRING );
+	$nonce = filter_input( INPUT_POST, 'googleauthenticator', FILTER_UNSAFE_RAW );
 	if ( wp_verify_nonce( $nonce, 'googleauthenticator' ) ) {
 		if ( $is_network ) {
 			$network_settings_only = array_key_exists( 'network_settings_only', $_POST );
