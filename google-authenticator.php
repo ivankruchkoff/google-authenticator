@@ -197,7 +197,7 @@ function add_qrcode_script() {
  */
 function add_pages() {
 	// No menu entry for this page
-	add_submenu_page( null, esc_html__( 'Google Authenticator', 'google-authenticator' ), null, 'read', self::SETUP_PAGE, array( $this, 'user_setup_page' ) );
+	add_submenu_page( 'admin.php', esc_html__( 'Google Authenticator', 'google-authenticator' ), null, 'read', self::SETUP_PAGE, array( $this, 'user_setup_page' ) );
 
 	// Site admin screen
 	add_submenu_page( 'options-general.php', esc_html__( 'Google Authenticator', 'google-authenticator' ), esc_html__( 'Google Authenticator', 'google-authenticator' ), 'manage_options', 'google_authenticator', array( $this, 'admin_setup_page' ) );
@@ -380,7 +380,7 @@ function user_setup_page() {
  * @param $is_network
  */
 function save_submitted_admin_setup_page( $is_network ) {
-	$nonce = filter_input( INPUT_POST, 'googleauthenticator', FILTER_SANITIZE_STRING );
+	$nonce = filter_input( INPUT_POST, 'googleauthenticator', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 	if ( wp_verify_nonce( $nonce, 'googleauthenticator' ) ) {
 		if ( $is_network ) {
 			$network_settings_only = array_key_exists( 'network_settings_only', $_POST );
@@ -563,12 +563,41 @@ function loginfooter() {
 }
 
 /**
+ * Refill username and password fields on login form.
+ */
+function refillfields() {
+	echo "\n<script type=\"text/javascript\">\n";
+	echo "\ttry{\n";
+	echo "\t\tdocument.getElementById('user_login').value = '" . esc_js( $_POST['log'] ) . "';\n";
+	echo "\t\tdocument.getElementById('user_pass').value = '" . esc_js( $_POST['pwd'] ) . "';\n";
+	echo "\t} catch(e){}\n";
+	echo "</script>\n";
+}
+
+/**
+ * Focus on Google Authenticator code input field.
+ */
+function focusongoogleotp() {
+	echo "\n<script type=\"text/javascript\">\n";
+	echo "\ttry{\n";
+	echo "\t\tdocument.getElementById('googleotp').focus();\n";
+	echo "\t} catch(e){}\n";
+	echo "</script>\n";
+}
+
+/**
  * Login form handling.
  * Check Google Authenticator verification code, if user has been setup to do so.
  * @param wordpressuser / WP_Error
  * @return user/loginstatus
  */
 function check_otp( $user, $username = '', $password = '' ) {
+
+	// If previous authentication check failed, don't even bother.
+	if( is_wp_error( $user ) ) {
+		return $user;
+	}
+
 	// Store result of loginprocess, so far.
 	$userstate = $user;
 
@@ -619,6 +648,10 @@ function check_otp( $user, $username = '', $password = '' ) {
 				} 		 
 			} else {
 				if ( ! $this->is_two_screen_signin_enabled() ) {
+					// Disable WP's autofocus on the username field
+					add_filter( 'enable_login_autofocus', '__return_false' );
+					add_action( 'login_footer', array( $this, 'refillfields' ) );
+					add_action( 'login_footer', array( $this, 'focusongoogleotp' ) );
 					return new WP_Error( 'invalid_google_authenticator_token', __( '<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired.', 'google-authenticator' ) );
 				} else {
 					wp_logout();
