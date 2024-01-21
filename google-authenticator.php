@@ -197,7 +197,7 @@ function add_qrcode_script() {
  */
 function add_pages() {
 	// No menu entry for this page
-	add_submenu_page( null, esc_html__( 'Google Authenticator', 'google-authenticator' ), null, 'read', self::SETUP_PAGE, array( $this, 'user_setup_page' ) );
+	add_submenu_page( '', esc_html__( 'Google Authenticator', 'google-authenticator' ), null, 'read', self::SETUP_PAGE, array( $this, 'user_setup_page' ) );
 
 	// Site admin screen
 	add_submenu_page( 'options-general.php', esc_html__( 'Google Authenticator', 'google-authenticator' ), esc_html__( 'Google Authenticator', 'google-authenticator' ), 'manage_options', 'google_authenticator', array( $this, 'admin_setup_page' ) );
