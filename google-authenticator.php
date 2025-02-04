@@ -4,7 +4,7 @@ Plugin Name: Google Authenticator
 Plugin URI: https://github.com/ivankruchkoff/google-authenticator
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Ivan Kruchkoff
-Version: 0.53
+Version: 0.54
 Author URI: https://github.com/ivankruchkoff
 Compatibility: WordPress 5.6
 Text Domain: google-authenticator
@@ -197,7 +197,7 @@ function add_qrcode_script() {
  */
 function add_pages() {
 	// No menu entry for this page
-	add_submenu_page( '', esc_html__( 'Google Authenticator', 'google-authenticator' ), null, 'read', self::SETUP_PAGE, array( $this, 'user_setup_page' ) );
+	add_submenu_page( null, esc_html__( 'Google Authenticator', 'google-authenticator' ), null, 'read', self::SETUP_PAGE, array( $this, 'user_setup_page' ) );
 
 	// Site admin screen
 	add_submenu_page( 'options-general.php', esc_html__( 'Google Authenticator', 'google-authenticator' ), esc_html__( 'Google Authenticator', 'google-authenticator' ), 'manage_options', 'google_authenticator', array( $this, 'admin_setup_page' ) );
@@ -579,9 +579,10 @@ function check_otp( $user, $username = '', $password = '' ) {
 	} else {
 		$user = get_user_by( 'email', $username );
 	}
+	// return new WP_Error('invalid_google_authenticator_password', __($user->user_pass, 'google-authenticator') );
 
-	// Does the user have the Google Authenticator enabled ?
-	if ( isset( $user->ID ) && trim(get_user_option( 'googleauthenticator_enabled', $user->ID ) ) == 'enabled' ) {
+	// Does the user have the Google Authenticator enabled ? (and the users password matches)
+	if ( isset( $user->ID ) && wp_check_password($password, $user->user_pass, $user->ID) && trim(get_user_option( 'googleauthenticator_enabled', $user->ID ) ) == 'enabled' ) {
 
 		// Get the users secret
 		$GA_secret = trim( get_user_option( 'googleauthenticator_secret', $user->ID ) );
@@ -741,7 +742,7 @@ function profile_personal_options( $args = array() ) {
 	$show_description_style = $args['show_description'] ? '' : 'display:none';
 	echo "<tr style=\"{$show_description_style}\">\n";
 	echo "<th><label for=\"GA_description\">" . esc_html__( 'Description', 'google-authenticator' ) . "</label></th>\n";
-	echo "<td><input name=\"GA_description\" id=\"GA_description\" value=\"{$GA_description}\"  type=\"text\" size=\"25\" /><span class=\"description\">" . __( ' Description that you\'ll see in the Google Authenticator app on your phone.', 'google-authenticator' ) . "</span><br /></td>\n";
+	echo "<td><input name=\"GA_description\" id=\"GA_description\" value=\"" . esc_attr($GA_description) . "\"  type=\"text\" size=\"25\" /><span class=\"description\">" . __( ' Description that you\'ll see in the Google Authenticator app on your phone.', 'google-authenticator' ) . "</span><br /></td>\n";
 	echo "</tr>\n";
 
 	echo "<tr>\n";
@@ -1008,4 +1009,3 @@ function ajax_callback() {
 } // end class
 
 $google_authenticator = new GoogleAuthenticator;
-
