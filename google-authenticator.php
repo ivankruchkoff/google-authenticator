@@ -4,7 +4,7 @@ Plugin Name: Google Authenticator
 Plugin URI: https://github.com/ivankruchkoff/google-authenticator
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Ivan Kruchkoff
-Version: 0.53
+Version: 0.54-security
 Author URI: https://github.com/ivankruchkoff
 Compatibility: WordPress 5.6
 Text Domain: google-authenticator
@@ -71,8 +71,9 @@ function __construct() {
  * Initialization, Hooks, and localization
  */
 function init() {
-	if ( ! class_exists( 'Base32' ) ) {
-		require_once( 'base32.php' );
+	$base32_file = plugin_dir_path( __FILE__ ) . 'base32.php';
+	if ( ! class_exists( 'Base32' ) && file_exists( $base32_file ) ) {
+		require_once( $base32_file );
 	}
 
     if ( ! $this->is_two_screen_signin_enabled() ) {
@@ -114,12 +115,64 @@ function is_two_screen_signin_enabled() {
 }
 
 /**
+ * Check rate limiting for authentication attempts
+ * Limits to 5 attempts per 15 minutes per user
+ *
+ * @param int $user_id User ID to check
+ * @return bool|WP_Error True if allowed, WP_Error if rate limited
+ */
+function check_rate_limit( $user_id ) {
+	$attempts_key = 'ga_attempts_' . $user_id;
+	$lockout_key = 'ga_lockout_' . $user_id;
+
+	// Check if user is locked out
+	if ( get_transient( $lockout_key ) ) {
+		return new WP_Error(
+			'rate_limit_exceeded',
+			__( '<strong>ERROR</strong>: Too many failed authentication attempts. Please try again in 15 minutes.', 'google-authenticator' )
+		);
+	}
+
+	// Get current attempt count
+	$attempts = get_transient( $attempts_key );
+	if ( false === $attempts ) {
+		$attempts = 0;
+	}
+
+	// Increment attempts
+	$attempts++;
+	set_transient( $attempts_key, $attempts, 15 * MINUTE_IN_SECONDS );
+
+	// Lock out after 5 attempts
+	if ( $attempts >= 5 ) {
+		set_transient( $lockout_key, true, 15 * MINUTE_IN_SECONDS );
+		error_log( "Google Authenticator plugin: Rate limit exceeded for user ID {$user_id}" );
+		return new WP_Error(
+			'rate_limit_exceeded',
+			__( '<strong>ERROR</strong>: Too many failed authentication attempts. Please try again in 15 minutes.', 'google-authenticator' )
+		);
+	}
+
+	return true;
+}
+
+/**
+ * Reset rate limiting after successful authentication
+ *
+ * @param int $user_id User ID
+ */
+function reset_rate_limit( $user_id ) {
+	delete_transient( 'ga_attempts_' . $user_id );
+	delete_transient( 'ga_lockout_' . $user_id );
+}
+
+/**
  * Check the verification code entered by the user.
  */
 
 function verify( $secretkey, $thistry, $relaxedmode, $lasttimeslot ) {
 	// Did the user enter 6 digits ?
-	if ( strlen( $thistry ) != 6) {
+	if ( ! is_string( $thistry ) || strlen( $thistry ) != 6 || ! ctype_digit( $thistry ) ) {
 		return false;
 	} else {
 		$thistry = intval ( $thistry );
@@ -153,7 +206,8 @@ function verify( $secretkey, $thistry, $relaxedmode, $lasttimeslot ) {
 		// Only 32 bits
 		$value = $value & 0x7FFFFFFF;
 		$value = $value % 1000000;
-		if ( $value === $thistry ) {
+		// Use hash_equals for constant-time comparison to prevent timing attacks
+		if ( hash_equals( (string) $value, (string) $thistry ) ) {
 			// Check for replay (Man-in-the-middle) attack.
 			// Since this is not Star Trek, time can only move forward,
 			// meaning current login attempt has to be in the future compared to
@@ -173,12 +227,15 @@ function verify( $secretkey, $thistry, $relaxedmode, $lasttimeslot ) {
  * Create a new random secret for the Google Authenticator app.
  * 16 characters, randomly chosen from the allowed Base32 characters
  * equals 10 bytes = 80 bits, as 256^10 = 32^16 = 2^80
- */ 
+ *
+ * SECURITY: Uses random_int() for cryptographically secure randomness
+ */
 function create_secret() {
     $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'; // allowed characters in Base32
     $secret = '';
+    $chars_length = strlen( $chars );
     for ( $i = 0; $i < 16; $i++ ) {
-        $secret .= substr( $chars, wp_rand( 0, strlen( $chars ) - 1 ), 1 );
+        $secret .= $chars[ random_int( 0, $chars_length - 1 ) ];
     }
     return $secret;
 }
@@ -218,7 +275,7 @@ function user_needs_to_setup_google_authenticator() {
 	}
 
 	$must_signup = false;
-	$user_role = $user->roles[0];
+	$user_role = ! empty( $user->roles ) ? $user->roles[0] : '';
 	$check_single_site_admin_options = true;
 
 	if ( is_multisite() ) {
@@ -265,6 +322,12 @@ function redirect_if_setup_required() {
 function save_submitted_setup_page() {
 	$this->error_message = null; // Reset a previous error message if it was set
 	$user = wp_get_current_user();
+
+	// Verify nonce for CSRF protection
+	if ( ! isset( $_POST['ga_setup_nonce'] ) || ! wp_verify_nonce( $_POST['ga_setup_nonce'], 'ga_setup_action_' . $user->ID ) ) {
+		return;
+	}
+
 	$secret = empty( $_POST['GA_secret'] ) ? false : sanitize_text_field( $_POST['GA_secret']);
 	$otp = empty( $_POST['GA_otp_code'] ) ? false : sanitize_text_field( $_POST['GA_otp_code']);
 	if ( ! strlen( $secret ) || ! strlen( $otp ) ) {
@@ -361,7 +424,10 @@ function user_setup_page() {
 			<?php echo esc_html__( 'If the account setup was successful, you will be logged out, and will need to login again using your Username, Password and Authenticator code generated using the App on your mobile device.', 'google-authenticator' ); ?>
 		</p>
 		<form method="post">
-		<?php $this->profile_personal_options( array(
+		<?php
+		$user = wp_get_current_user();
+		wp_nonce_field( 'ga_setup_action_' . $user->ID, 'ga_setup_nonce' );
+		$this->profile_personal_options( array(
 			'show_active' => false,
 			'show_relaxed_mode' => false,
 			'show_description' => false,
@@ -380,7 +446,7 @@ function user_setup_page() {
  * @param $is_network
  */
 function save_submitted_admin_setup_page( $is_network ) {
-	$nonce = filter_input( INPUT_POST, 'googleauthenticator', FILTER_SANITIZE_STRING );
+	$nonce = isset( $_POST['googleauthenticator'] ) ? sanitize_text_field( $_POST['googleauthenticator'] ) : '';
 	if ( wp_verify_nonce( $nonce, 'googleauthenticator' ) ) {
 		if ( $is_network ) {
 			$network_settings_only = array_key_exists( 'network_settings_only', $_POST );
@@ -520,7 +586,7 @@ function show_role_checkbox( $role_key, $role, $is_network ) {
 
 	$readonly = $readonly ? ' readonly="readonly"' : '';
 	?>
-	<p><label><input name="roles[]" type="checkbox"<?php echo esc_html( $readonly ) . checked( $checked, true, false ); ?>value="<?php esc_attr_e( $role_key ); ?>"><strong><?php esc_html_e( $role[ 'name' ] ); ?></strong></label> <?php echo $readonly_label; ?></p>
+	<p><label><input name="roles[]" type="checkbox"<?php echo $readonly; checked( $checked, true ); ?> value="<?php esc_attr_e( $role_key ); ?>"><strong><?php esc_html_e( $role[ 'name' ] ); ?></strong></label> <?php echo $readonly_label; ?></p>
 	<?php
 }
 
@@ -583,6 +649,12 @@ function check_otp( $user, $username = '', $password = '' ) {
 	// Does the user have the Google Authenticator enabled ?
 	if ( isset( $user->ID ) && trim(get_user_option( 'googleauthenticator_enabled', $user->ID ) ) == 'enabled' ) {
 
+		// Check rate limiting
+		$rate_limit_check = $this->check_rate_limit( $user->ID );
+		if ( is_wp_error( $rate_limit_check ) ) {
+			return $rate_limit_check;
+		}
+
 		// Get the users secret
 		$GA_secret = trim( get_user_option( 'googleauthenticator_secret', $user->ID ) );
 		
@@ -601,6 +673,8 @@ function check_otp( $user, $username = '', $password = '' ) {
 		if ( $timeslot = $this->verify( $GA_secret, $otp, $GA_relaxedmode, $lasttimeslot ) ) {
 			// Store the timeslot in which login was successful.
 			update_user_option( $user->ID, 'googleauthenticator_lasttimeslot', $timeslot, true );
+			// Reset rate limiting after successful authentication
+			$this->reset_rate_limit( $user->ID );
 			return $userstate;
 		} else {
 			// No, lets see if an app password is enabled, and this is an XMLRPC / APP login ?
@@ -621,6 +695,13 @@ function check_otp( $user, $username = '', $password = '' ) {
 				if ( ! $this->is_two_screen_signin_enabled() ) {
 					return new WP_Error( 'invalid_google_authenticator_token', __( '<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired.', 'google-authenticator' ) );
 				} else {
+					// Store user ID in session instead of passing password in form
+					if ( ! session_id() ) {
+						session_start();
+					}
+					$_SESSION['ga_pending_user_id'] = $user->ID;
+					$_SESSION['ga_pending_timestamp'] = time();
+					$_SESSION['ga_pending_redirect'] = isset( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : admin_url();
 					wp_logout();
 					$this->secondary_login_screen();
 					exit;
@@ -634,23 +715,66 @@ function check_otp( $user, $username = '', $password = '' ) {
 }
 
 function secondary_login_screen() {
-	$redirect_to = isset( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : admin_url();
+	if ( ! session_id() ) {
+		session_start();
+	}
+
+	// Verify session exists and hasn't expired (5 minute timeout)
+	if ( ! isset( $_SESSION['ga_pending_user_id'] ) || ! isset( $_SESSION['ga_pending_timestamp'] ) ) {
+		wp_redirect( wp_login_url() );
+		exit;
+	}
+
+	if ( time() - $_SESSION['ga_pending_timestamp'] > 300 ) { // 5 minute timeout
+		unset( $_SESSION['ga_pending_user_id'] );
+		unset( $_SESSION['ga_pending_timestamp'] );
+		unset( $_SESSION['ga_pending_redirect'] );
+		wp_redirect( wp_login_url() );
+		exit;
+	}
+
+	// Handle OTP submission
+	if ( isset( $_POST['googleotp'] ) && isset( $_POST['ga_secondary_nonce'] ) ) {
+		if ( wp_verify_nonce( $_POST['ga_secondary_nonce'], 'ga_secondary_login' ) ) {
+			$user_id = $_SESSION['ga_pending_user_id'];
+			$otp = sanitize_text_field( $_POST['googleotp'] );
+			$user = get_user_by( 'id', $user_id );
+
+			if ( $user ) {
+				$GA_secret = trim( get_user_option( 'googleauthenticator_secret', $user_id ) );
+				$GA_relaxedmode = trim( get_user_option( 'googleauthenticator_relaxedmode', $user_id ) );
+				$lasttimeslot = trim( get_user_option( 'googleauthenticator_lasttimeslot', $user_id ) );
+
+				if ( $timeslot = $this->verify( $GA_secret, $otp, $GA_relaxedmode, $lasttimeslot ) ) {
+					// Success! Log the user in
+					update_user_option( $user_id, 'googleauthenticator_lasttimeslot', $timeslot, true );
+					$this->reset_rate_limit( $user_id );
+					wp_set_auth_cookie( $user_id, isset( $_POST['rememberme'] ) );
+					$redirect_to = isset( $_SESSION['ga_pending_redirect'] ) ? $_SESSION['ga_pending_redirect'] : admin_url();
+					unset( $_SESSION['ga_pending_user_id'] );
+					unset( $_SESSION['ga_pending_timestamp'] );
+					unset( $_SESSION['ga_pending_redirect'] );
+					wp_safe_redirect( $redirect_to );
+					exit;
+				}
+			}
+		}
+	}
+
+	$redirect_to = isset( $_SESSION['ga_pending_redirect'] ) ? $_SESSION['ga_pending_redirect'] : admin_url();
 	login_header( esc_html__('Secondary Login Screen', 'google-authenticator' ) );
-	if ( array_key_exists( 'googleotp', $_REQUEST ) ) {
-		if ( 0 === strlen( $_REQUEST[ 'googleotp'] ) ) {
+
+	if ( isset( $_POST['googleotp'] ) ) {
+		if ( 0 === strlen( $_POST['googleotp'] ) ) {
 			$error_message = __( '<strong>ERROR</strong>: The Google Authenticator code is missing.', 'google-authenticator' );
 		} else {
 			$error_message = __( '<strong>ERROR</strong>: The Google Authenticator code is incorrect or has expired.', 'google-authenticator' );
 		}
-		echo '<div id="login_error">' . $error_message . '</div>';
-	}?>
+		echo '<div id="login_error">' . esc_html( $error_message ) . '</div>';
+	}
+	?>
 	<form name="loginform" id="loginform" action="<?php echo esc_url( site_url( 'wp-login.php', 'login_post' ) ); ?>" method="post">
-		<input type="hidden" name="log" value="<?php echo esc_attr( $_REQUEST['log'] ); ?>" />
-		<input type="hidden" name="pwd" value="<?php echo esc_attr( $_REQUEST['pwd'] ); ?>" />
-		<input type="hidden" name="wp-submit" value="<?php echo esc_attr( $_REQUEST['wp-submit'] ); ?>" />
-		<?php if ( array_key_exists( 'rememberme', $_REQUEST ) && 'forever' === $_REQUEST[ 'rememberme']): ?>
-				<input name="rememberme" type="hidden" id="rememberme" value="forever" />
-		<?php endif; ?>
+		<?php wp_nonce_field( 'ga_secondary_login', 'ga_secondary_nonce' ); ?>
 		<?php $this->loginform(); ?>
 		<p><?php esc_html_e( 'Please enter the Google Authenticator code using the app on your device.', 'google-authenticator' ); ?></p>
 		<p class="submit">
