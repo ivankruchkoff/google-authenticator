@@ -80,6 +80,11 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 4. Google Authenticator app on Android
 
 == Changelog ==
+= 0.55 =
+* Improved PHP compatibility for PHP 7.4 through 8.5.
+* Fixed deprecated and strict runtime issues in plugin code.
+* Improved compatibility and safety of Base32 handling.
+
 = 0.54 =
 * Fixed a bug in multisite.
 

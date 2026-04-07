@@ -86,6 +86,15 @@ Yes, the Man-in-the-middle attack/replay detection code isn't compatible with th
 4. Google Authenticator app on Android
 
 ## Changelog ##
+
+**0.55**
+* Improved PHP compatibility for PHP 7.4 through 8.5.
+* Fixed deprecated and strict runtime issues in plugin code.
+* Improved compatibility and safety of Base32 handling.
+
+**0.54**
+* Fixed a bug in multisite.
+
 **0.53**
 * Add a Polish translation
 
