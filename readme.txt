@@ -1,9 +1,9 @@
 === Google Authenticator ===
 Contributors: ivankk
-Tags: authentication,otp,password,security,login,android,iphone,blackberry
+Tags: authentication,otp,password,security,login
 Requires at least: 4.5
-Tested up to: 6.0
-Stable tag: 0.54
+Tested up to: 7.0
+Stable tag: 0.55
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 

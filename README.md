@@ -1,13 +1,13 @@
 # Google Authenticator #
 Contributors: ivankk
 
-Tags: authentication, otp, password, security, login, android, iphone, blackberry
+Tags: authentication, otp, password, security, login
 
 Requires at least: 4.5
 
-Tested up to: 5.6
+Tested up to: 7.0
 
-Stable tag: 0.53
+Stable tag: 0.55
 
 License: GPLv2 or later
 
