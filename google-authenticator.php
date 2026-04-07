@@ -4,7 +4,7 @@ Plugin Name: Google Authenticator
 Plugin URI: https://github.com/ivankruchkoff/google-authenticator
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Ivan Kruchkoff
-Version: 0.53
+Version: 0.55
 Author URI: https://github.com/ivankruchkoff
 Compatibility: WordPress 5.6
 Text Domain: google-authenticator
@@ -136,7 +136,10 @@ function verify( $secretkey, $thistry, $relaxedmode, $lasttimeslot ) {
 
 	$tm = floor( time() / 30 );
 
-	$secretkey=Base32::decode($secretkey);
+	$secretkey = Base32::decode( $secretkey );
+	if ( ! is_string( $secretkey ) || '' === $secretkey ) {
+		return false;
+	}
 	// Keys from 30 seconds before and after are valid aswell.
 	for ($i=$firstcount; $i<=$lastcount; $i++) {
 		// Pack time into binary string
@@ -218,12 +221,12 @@ function user_needs_to_setup_google_authenticator() {
 	}
 
 	$must_signup = false;
-	$user_role = $user->roles[0];
+	$user_role = ! empty( $user->roles ) ? $user->roles[0] : '';
 	$check_single_site_admin_options = true;
 
 	if ( is_multisite() ) {
 		$roles = get_site_option( 'googleauthenticator_mandatory_mfa_roles', array() );
-		if ( in_array( $user_role, $roles ) ) {
+		if ( in_array( $user_role, $roles, true ) ) {
 			$must_signup = true;
 		}
 		$check_single_site_admin_options = '1' !== get_site_option( 'googleauthenticator_network_only' ) ;
@@ -231,7 +234,7 @@ function user_needs_to_setup_google_authenticator() {
 
 	if ( ! $must_signup && $check_single_site_admin_options ) {
 		$roles = get_option( 'googleauthenticator_mandatory_mfa_roles', array() );
-		if ( in_array( $user_role, $roles ) ) {
+		if ( in_array( $user_role, $roles, true ) ) {
 			$must_signup = true;
 		}
 
@@ -265,9 +268,9 @@ function redirect_if_setup_required() {
 function save_submitted_setup_page() {
 	$this->error_message = null; // Reset a previous error message if it was set
 	$user = wp_get_current_user();
-	$secret = empty( $_POST['GA_secret'] ) ? false : sanitize_text_field( $_POST['GA_secret']);
-	$otp = empty( $_POST['GA_otp_code'] ) ? false : sanitize_text_field( $_POST['GA_otp_code']);
-	if ( ! strlen( $secret ) || ! strlen( $otp ) ) {
+	$secret = empty( $_POST['GA_secret'] ) ? '' : sanitize_text_field( $_POST['GA_secret'] );
+	$otp    = empty( $_POST['GA_otp_code'] ) ? '' : sanitize_text_field( $_POST['GA_otp_code'] );
+	if ( '' === $secret || '' === $otp ) {
 		return;
 	}
 	$relaxed_mode = trim( get_user_option( 'googleauthenticator_relaxedmode', $user->ID ) );
@@ -380,7 +383,9 @@ function user_setup_page() {
  * @param $is_network
  */
 function save_submitted_admin_setup_page( $is_network ) {
-	$nonce = filter_input( INPUT_POST, 'googleauthenticator', FILTER_SANITIZE_STRING );
+	$nonce = isset( $_POST['googleauthenticator'] )
+		? sanitize_text_field( wp_unslash( $_POST['googleauthenticator'] ) )
+		: '';
 	if ( wp_verify_nonce( $nonce, 'googleauthenticator' ) ) {
 		if ( $is_network ) {
 			$network_settings_only = array_key_exists( 'network_settings_only', $_POST );
@@ -412,6 +417,7 @@ function save_submitted_admin_setup_page( $is_network ) {
 		}
 		return true;
 	}
+	return false;
 }
 
 /**
@@ -605,8 +611,11 @@ function check_otp( $user, $username = '', $password = '' ) {
 		} else {
 			// No, lets see if an app password is enabled, and this is an XMLRPC / APP login ?
 			if ( trim( get_user_option( 'googleauthenticator_pwdenabled', $user->ID ) ) == 'enabled' && ( defined('XMLRPC_REQUEST') || defined('APP_REQUEST') ) ) {
-				$GA_passwords 	= json_decode(  get_user_option( 'googleauthenticator_passwords', $user->ID ) );
-				$passwordhash	= trim($GA_passwords->{'password'} );
+				$GA_passwords 	= json_decode( get_user_option( 'googleauthenticator_passwords', $user->ID ) );
+				if ( ! is_object( $GA_passwords ) || ! isset( $GA_passwords->password ) ) {
+					return new WP_Error( 'invalid_google_authenticator_password', __( '<strong>ERROR</strong>: The Google Authenticator password is incorrect.', 'google-authenticator' ) );
+				}
+				$passwordhash	= trim( $GA_passwords->password );
 				$usersha1		= sha1( strtoupper( str_replace( ' ', '', $password ) ) );
 				if ( $passwordhash == $usersha1 ) { // ToDo: Remove after some time when users have migrated to new format
 					return new WP_User( $user->ID );
@@ -645,9 +654,9 @@ function secondary_login_screen() {
 		echo '<div id="login_error">' . $error_message . '</div>';
 	}?>
 	<form name="loginform" id="loginform" action="<?php echo esc_url( site_url( 'wp-login.php', 'login_post' ) ); ?>" method="post">
-		<input type="hidden" name="log" value="<?php echo esc_attr( $_REQUEST['log'] ); ?>" />
-		<input type="hidden" name="pwd" value="<?php echo esc_attr( $_REQUEST['pwd'] ); ?>" />
-		<input type="hidden" name="wp-submit" value="<?php echo esc_attr( $_REQUEST['wp-submit'] ); ?>" />
+		<input type="hidden" name="log" value="<?php echo esc_attr( isset( $_REQUEST['log'] ) ? $_REQUEST['log'] : '' ); ?>" />
+		<input type="hidden" name="pwd" value="<?php echo esc_attr( isset( $_REQUEST['pwd'] ) ? $_REQUEST['pwd'] : '' ); ?>" />
+		<input type="hidden" name="wp-submit" value="<?php echo esc_attr( isset( $_REQUEST['wp-submit'] ) ? $_REQUEST['wp-submit'] : '' ); ?>" />
 		<?php if ( array_key_exists( 'rememberme', $_REQUEST ) && 'forever' === $_REQUEST[ 'rememberme']): ?>
 				<input name="rememberme" type="hidden" id="rememberme" value="forever" />
 		<?php endif; ?>
@@ -709,7 +718,8 @@ function profile_personal_options( $args = array() ) {
 		// Super admins and users with accounts on more than one site get the network name as the helpful name,
 		// everyone else gets the site that they're on
 		if ( is_multisite() && ( 1 < count( get_blogs_of_user( $user_id ) ) || is_super_admin() ) ) {
-			$GA_description = sanitize_text_field( get_blog_details( get_network()->id )->blogname );
+			$blog_details   = get_blog_details( get_network()->id );
+			$GA_description = sanitize_text_field( $blog_details ? $blog_details->blogname : get_bloginfo( 'name' ) );
 		} else {
 			$GA_description = sanitize_text_field( get_bloginfo( 'name' ) );
 		}
@@ -741,7 +751,7 @@ function profile_personal_options( $args = array() ) {
 	$show_description_style = $args['show_description'] ? '' : 'display:none';
 	echo "<tr style=\"{$show_description_style}\">\n";
 	echo "<th><label for=\"GA_description\">" . esc_html__( 'Description', 'google-authenticator' ) . "</label></th>\n";
-	echo "<td><input name=\"GA_description\" id=\"GA_description\" value=\"{$GA_description}\"  type=\"text\" size=\"25\" /><span class=\"description\">" . __( ' Description that you\'ll see in the Google Authenticator app on your phone.', 'google-authenticator' ) . "</span><br /></td>\n";
+	echo "<td><input name=\"GA_description\" id=\"GA_description\" value=\"" . esc_attr( $GA_description ) . "\"  type=\"text\" size=\"25\" /><span class=\"description\">" . __( ' Description that you\'ll see in the Google Authenticator app on your phone.', 'google-authenticator' ) . "</span><br /></td>\n";
 	echo "</tr>\n";
 
 	echo "<tr>\n";
@@ -803,7 +813,7 @@ function profile_personal_options( $args = array() ) {
 		submit_button( esc_html__( 'Verify Authenticator Code', 'google-authenticator' ) );
 	}
 	echo "<script type=\"text/javascript\">\n";
-	echo "var GAnonce='".wp_create_nonce('GoogleAuthenticatoraction')."';\n";
+	echo "var GAnonce='". esc_js( wp_create_nonce('GoogleAuthenticatoraction') )."';\n";
 
   	echo <<<ENDOFJS
   	//Create new secret and display it
@@ -888,11 +898,11 @@ function personal_options_update() {
 
 
 	$GA_enabled	= ! empty( $_POST['GA_enabled'] );
-	$GA_description	= trim( sanitize_text_field($_POST['GA_description'] ) );
+	$GA_description	= trim( sanitize_text_field( isset( $_POST['GA_description'] ) ? $_POST['GA_description'] : '' ) );
 	$GA_relaxedmode	= ! empty( $_POST['GA_relaxedmode'] );
-	$GA_secret	= trim( $_POST['GA_secret'] );
+	$GA_secret	= sanitize_text_field( trim( isset( $_POST['GA_secret'] ) ? $_POST['GA_secret'] : '' ) );
 	$GA_pwdenabled	= ! empty( $_POST['GA_pwdenabled'] );
-	$GA_password	= str_replace(' ', '', trim( $_POST['GA_password'] ) );
+	$GA_password	= str_replace( ' ', '', trim( isset( $_POST['GA_password'] ) ? $_POST['GA_password'] : '' ) );
 	
 	if ( ! $GA_enabled ) {
 		$GA_enabled = 'disabled';
