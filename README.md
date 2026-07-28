@@ -187,9 +187,13 @@ Yes, the Man-in-the-middle attack/replay detection code isn't compatible with th
 
 Thanks to:
 
-[Paweł Nowacki](https://github.com/pancek) for the Polish translation
+[Miguel Mendez Z](https://wpscan.com/) for responsibly disclosing a CSRF account lockout vulnerability.
 
-[Fabio Zumbi](https://github.com/FabioZumbi12) for the Portuguese translation
+[Oleksiy](https://profiles.wordpress.org/evinak/) for a bugfix in multisite.
+
+[Paweł Nowacki](https://github.com/pancek) for the Polish translation.
+
+[Fabio Zumbi](https://github.com/FabioZumbi12) for the Portuguese translation.
 
 [Guido Schalkx](https://www.guidoschalkx.com/) for the Dutch Translation.
 

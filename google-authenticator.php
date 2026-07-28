@@ -4,7 +4,7 @@ Plugin Name: Google Authenticator
 Plugin URI: https://github.com/ivankruchkoff/google-authenticator
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Ivan Kruchkoff
-Version: 0.55
+Version: 0.56
 Author URI: https://github.com/ivankruchkoff
 Compatibility: WordPress 5.6
 Text Domain: google-authenticator
@@ -13,22 +13,25 @@ Domain Path: /lang
 ----------------------------------------------------------------------------
 
 
-    Thanks to Paweł Nowacki for the Polish translation.
-    Thanks to Fabio Zumbi for the Portuguese translation.
-    Thanks to Guido Schalkx for the Dutch translation.
-	Thanks to Henrik Schack for creating / maintaining versions 0.20 to 0.48
-	Thanks to Ivan Kruchkoff for his UX improvements in user signup.
-	Thanks to Bryan Ruiz for his Base32 encode/decode class, found at php.net.
-	Thanks to Tobias Bäthge for his major code rewrite and German translation.
-	Thanks to Pascal de Bruijn for his relaxed mode idea.
-	Thanks to Daniel Werl for his usability tips.
-	Thanks to Dion Hulse for his bugfixes.
-	Thanks to Aldo Latino for his Italian translation.
-	Thanks to Kaijia Feng for his Simplified Chinese translation.
-	Thanks to Ian Dunn for fixing some depricated function calls.
-	Thanks to Kimmo Suominen for fixing the iPhone description issue.
-	Thanks to Alex Concha for some security tips.
-	Thanks to Sébastien Prunier for his Spanish and French translations.
+Thanks to Miguel Mendez Z for responsibly disclosing a CSRF account lockout vulnerability.
+Thanks to Oleksiy for a bugfix in multisite.
+Thanks to Paweł Nowacki for the Polish translation.
+Thanks to Fabio Zumbi for the Portuguese translation.
+Thanks to Guido Schalkx for the Dutch translation.
+Thanks to Henrik Schack for creating / maintaining versions 0.20 to 0.48
+Thanks to Ivan Kruchkoff for his UX improvements in user signup.
+Thanks to Bryan Ruiz for his Base32 encode/decode class, found at php.net.
+Thanks to Tobias Bäthge for his major code rewrite and German translation.
+Thanks to Pascal de Bruijn for his relaxed mode idea.
+Thanks to Daniel Werl for his usability tips.
+Thanks to Dion Hulse for his bugfixes.
+Thanks to Aldo Latino for his Italian translation.
+Thanks to Kaijia Feng for his Simplified Chinese translation.
+Thanks to Ian Dunn for fixing some depricated function calls.
+Thanks to Kimmo Suominen for fixing the iPhone description issue.
+Thanks to Alex Concha for some security tips.
+Thanks to Sébastien Prunier for his Spanish and French translations.
+Thanks to Miguel Mendez Z for responsibly disclosing and reporting a CSRF account lockout vulnerability.
 
 ----------------------------------------------------------------------------
 
@@ -267,9 +270,16 @@ function redirect_if_setup_required() {
  */
 function save_submitted_setup_page() {
 	$this->error_message = null; // Reset a previous error message if it was set
+
+	if ( 'POST' !== strtoupper( isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '' ) ) {
+		return;
+	}
+
+	check_admin_referer( 'googleauthenticator_setup', 'googleauthenticator_setup_nonce' );
+
 	$user = wp_get_current_user();
-	$secret = empty( $_POST['GA_secret'] ) ? '' : sanitize_text_field( $_POST['GA_secret'] );
-	$otp    = empty( $_POST['GA_otp_code'] ) ? '' : sanitize_text_field( $_POST['GA_otp_code'] );
+	$secret = empty( $_POST['GA_secret'] ) ? '' : sanitize_text_field( wp_unslash( $_POST['GA_secret'] ) );
+	$otp    = empty( $_POST['GA_otp_code'] ) ? '' : sanitize_text_field( wp_unslash( $_POST['GA_otp_code'] ) );
 	if ( '' === $secret || '' === $otp ) {
 		return;
 	}
@@ -364,6 +374,8 @@ function user_setup_page() {
 			<?php echo esc_html__( 'If the account setup was successful, you will be logged out, and will need to login again using your Username, Password and Authenticator code generated using the App on your mobile device.', 'google-authenticator' ); ?>
 		</p>
 		<form method="post">
+		<?php wp_nonce_field( 'googleauthenticator_setup', 'googleauthenticator_setup_nonce' ); ?>
+		<?php wp_nonce_field( 'googleauthenticator_setup', 'googleauthenticator_setup_nonce' ); ?>
 		<?php $this->profile_personal_options( array(
 			'show_active' => false,
 			'show_relaxed_mode' => false,

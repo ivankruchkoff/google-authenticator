@@ -180,6 +180,8 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 
 Thanks to:
 
+[Miguel Mendez Z](https://wpscan.com/) for responsibly disclosing a CSRF account lockout vulnerability.
+
 [Oleksiy](https://profiles.wordpress.org/evinak/) for a bugfix in multisite.
 
 [Paweł Nowacki](https://github.com/pancek) for the Polish translation
