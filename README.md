@@ -7,7 +7,7 @@ Requires at least: 4.5
 
 Tested up to: 7.0
 
-Stable tag: 0.55
+Stable tag: 0.56
 
 License: GPLv2 or later
 
@@ -86,6 +86,9 @@ Yes, the Man-in-the-middle attack/replay detection code isn't compatible with th
 4. Google Authenticator app on Android
 
 ## Changelog ##
+
+**0.56**
+* Fixed CSRF account lockout bug.
 
 **0.55**
 * Improved PHP compatibility for PHP 7.4 through 8.5.

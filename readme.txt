@@ -3,7 +3,7 @@ Contributors: ivankk
 Tags: authentication,otp,password,security,login
 Requires at least: 4.5
 Tested up to: 7.0
-Stable tag: 0.55
+Stable tag: 0.56
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,9 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 4. Google Authenticator app on Android
 
 == Changelog ==
+= 0.56 =
+* Fixed CSRF account lockout bug.
+
 = 0.55 =
 * Improved PHP compatibility for PHP 7.4 through 8.5.
 * Fixed deprecated and strict runtime issues in plugin code.
