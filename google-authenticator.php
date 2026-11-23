@@ -4,7 +4,7 @@ Plugin Name: Google Authenticator
 Plugin URI: https://github.com/ivankruchkoff/google-authenticator
 Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
 Author: Ivan Kruchkoff
-Version: 0.56
+Version: 0.57
 Author URI: https://github.com/ivankruchkoff
 Compatibility: WordPress 5.6
 Text Domain: google-authenticator
@@ -13,6 +13,7 @@ Domain Path: /lang
 ----------------------------------------------------------------------------
 
 
+Thanks to Kuba (Wordfence) for responsibly disclosing an XML-RPC app password authentication bypass.
 Thanks to Miguel Mendez Z for responsibly disclosing a CSRF account lockout vulnerability.
 Thanks to Oleksiy for a bugfix in multisite.
 Thanks to Paweł Nowacki for the Polish translation.
@@ -627,12 +628,16 @@ function check_otp( $user, $username = '', $password = '' ) {
 				if ( ! is_object( $GA_passwords ) || ! isset( $GA_passwords->password ) ) {
 					return new WP_Error( 'invalid_google_authenticator_password', __( '<strong>ERROR</strong>: The Google Authenticator password is incorrect.', 'google-authenticator' ) );
 				}
-				$passwordhash	= trim( $GA_passwords->password );
-				$usersha1		= sha1( strtoupper( str_replace( ' ', '', $password ) ) );
-				if ( $passwordhash == $usersha1 ) { // ToDo: Remove after some time when users have migrated to new format
-					return new WP_User( $user->ID );
-				  // Try the new version based on thee wp_hash_password	function
-				} elseif (wp_check_password( strtoupper( str_replace( ' ', '', $password ) ), $passwordhash)) {
+				$passwordhash	= is_string( $GA_passwords->password ) ? trim( $GA_passwords->password ) : '';
+				$userpassword	= strtoupper( preg_replace( '/\s+/', '', (string) $password ) );
+
+				// Never accept an empty app password, and never accept a stored value that is not a
+				// wp_hash_password() hash. The legacy unsalted sha1 format has been removed (CVE-2026-88759).
+				if ( '' === $userpassword || ! $this->is_valid_app_password_hash( $passwordhash ) ) {
+					return new WP_Error( 'invalid_google_authenticator_password', __( '<strong>ERROR</strong>: The Google Authenticator password is incorrect.', 'google-authenticator' ) );
+				}
+
+				if ( wp_check_password( $userpassword, $passwordhash ) ) {
 					return new WP_User( $user->ID );
 				} else {
 					// Wrong XMLRPC/APP password !
@@ -652,6 +657,44 @@ function check_otp( $user, $username = '', $password = '' ) {
 	// Google Authenticator isn't enabled for this account,
 	// just resume normal authentication.
 	return $userstate;
+}
+
+/**
+ * Whether a stored app password value looks like a wp_hash_password() hash.
+ *
+ * Rejects empty values and the legacy unsalted sha1 (40 chars) / md5 (32 chars) formats.
+ *
+ * @param mixed $hash Stored hash.
+ * @return bool
+ */
+function is_valid_app_password_hash( $hash ) {
+	return is_string( $hash ) && strlen( $hash ) > 40;
+}
+
+/**
+ * Whether the user has a real (non-empty, properly hashed) app password stored.
+ *
+ * Removes stale values left behind by versions up to 0.56, which could store a hash of an
+ * empty string when the profile was saved before an app password was generated (CVE-2026-88759).
+ *
+ * @param int $user_id User ID.
+ * @return bool
+ */
+function has_usable_app_password( $user_id ) {
+	$stored = get_user_option( 'googleauthenticator_passwords', $user_id );
+	if ( empty( $stored ) ) {
+		return false;
+	}
+
+	$GA_passwords = json_decode( $stored );
+	$hash         = ( is_object( $GA_passwords ) && isset( $GA_passwords->password ) && is_string( $GA_passwords->password ) ) ? trim( $GA_passwords->password ) : '';
+
+	if ( ! $this->is_valid_app_password_hash( $hash ) || wp_check_password( '', $hash ) ) {
+		delete_user_option( $user_id, 'googleauthenticator_passwords', true );
+		return false;
+	}
+
+	return true;
 }
 
 function secondary_login_screen() {
@@ -713,13 +756,10 @@ function profile_personal_options( $args = array() ) {
 	$GA_relaxedmode		= trim( get_user_option( 'googleauthenticator_relaxedmode', $user_id ) );
 	$GA_description		= trim( get_user_option( 'googleauthenticator_description', $user_id ) );
 	$GA_pwdenabled		= trim( get_user_option( 'googleauthenticator_pwdenabled', $user_id ) );
-	$GA_password		= trim( get_user_option( 'googleauthenticator_passwords', $user_id ) );
-	
 	// We dont store the generated app password in cleartext so there is no point in trying
 	// to show the user anything except from the fact that a password exists.
-	if ( $GA_password != '' ) {
-		$GA_password = "XXXX XXXX XXXX XXXX";
-	}
+	// has_usable_app_password() also discards empty/legacy hashes stored by older versions.
+	$GA_password		= $this->has_usable_app_password( $user_id ) ? 'XXXX XXXX XXXX XXXX' : '';
 
 	// In case the user has no secret ready (new install), we create one. or use the one they just posted
 	if ( '' == $GA_secret ) {
@@ -805,7 +845,7 @@ function profile_personal_options( $args = array() ) {
 		echo "<tr>\n";
 		echo "<th></th>\n";
 		echo "<td>\n";
-		echo "<input name=\"GA_password\" id=\"GA_password\" readonly=\"readonly\" value=\"".$GA_password."\" type=\"text\" size=\"25\" />";
+		echo "<input name=\"GA_password\" id=\"GA_password\" readonly=\"readonly\" value=\"" . esc_attr( $GA_password ) . "\" type=\"text\" size=\"25\" />";
 		echo "<input name=\"GA_createpassword\" id=\"GA_createpassword\" value=\"".__("Create new password",'google-authenticator')."\"   type=\"button\" class=\"button\" />";
 		echo "<span class=\"description\" id=\"GA_passworddesc\"> ".__(' Password is not stored in cleartext, this is your only chance to see it.','google-authenticator')."</span>\n";
 		echo "</td>\n";
@@ -914,7 +954,7 @@ function personal_options_update() {
 	$GA_relaxedmode	= ! empty( $_POST['GA_relaxedmode'] );
 	$GA_secret	= sanitize_text_field( trim( isset( $_POST['GA_secret'] ) ? $_POST['GA_secret'] : '' ) );
 	$GA_pwdenabled	= ! empty( $_POST['GA_pwdenabled'] );
-	$GA_password	= str_replace( ' ', '', trim( isset( $_POST['GA_password'] ) ? $_POST['GA_password'] : '' ) );
+	$GA_password	= strtoupper( preg_replace( '/\s+/', '', isset( $_POST['GA_password'] ) ? sanitize_text_field( wp_unslash( $_POST['GA_password'] ) ) : '' ) );
 	
 	if ( ! $GA_enabled ) {
 		$GA_enabled = 'disabled';
@@ -935,8 +975,11 @@ function personal_options_update() {
 		$GA_pwdenabled = 'enabled';
 	}
 	
-	// Only store password if a new one has been generated.
-	if (strtoupper($GA_password) != 'XXXXXXXXXXXXXXXX' ) {
+	// Only store password if a new one has been generated. An empty field (no password created yet)
+	// or the "XXXX XXXX XXXX XXXX" placeholder (keep existing) must never be hashed and stored,
+	// otherwise an empty app password would be accepted over XML-RPC (CVE-2026-88759).
+	// Generated app passwords are always 16 Base32 characters (see create_secret()).
+	if ( 'XXXXXXXXXXXXXXXX' !== $GA_password && preg_match( '/^[A-Z2-7]{16}$/', $GA_password ) ) {
 		// Store the password in a format that can be expanded easily later on if needed.
 		$GA_password = array( 'appname' => 'Default', 'password' => wp_hash_password( $GA_password ) );
 		update_user_option( $user_id, 'googleauthenticator_passwords', json_encode( $GA_password ), true );

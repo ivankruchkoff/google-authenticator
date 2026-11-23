@@ -2,8 +2,8 @@
 Contributors: ivankk
 Tags: authentication,otp,password,security,login
 Requires at least: 4.5
-Tested up to: 7.0
-Stable tag: 0.56
+Tested up to: 7.1
+Stable tag: 0.57
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,11 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 4. Google Authenticator app on Android
 
 == Changelog ==
+= 0.57 =
+* Security: Fixed an authentication bypass where an empty app password could be accepted over XML-RPC (CVE-2026-88759). Thanks to Kuba (Wordfence).
+* Saving the profile no longer stores an app password unless one has actually been generated.
+* Empty or legacy (pre-2014 sha1) app passwords are now always rejected and removed. Affected users should create a new app password from their profile.
+
 = 0.56 =
 * Fixed CSRF account lockout bug.
 
