@@ -3,13 +3,14 @@
 # This file is distributed under the GPLv2 or later.
 # Original translation: Henrik Schack <henrik@schack.dk>
 # Version 0.58: missing strings added and errors corrected with machine-assisted (AI) translation.
+# Version 0.59: new strings translated the same way.
 # Corrections from native speakers are welcome at https://translate.wordpress.org/projects/wp-plugins/google-authenticator/
 msgid ""
 msgstr ""
-"Project-Id-Version: Google Authenticator 0.58\n"
+"Project-Id-Version: Google Authenticator 0.59\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/google-authenticator/\n"
-"POT-Creation-Date: 2026-11-26 12:31+0000\n"
-"PO-Revision-Date: 2026-11-26 12:41+0000\n"
+"POT-Creation-Date: 2026-11-26 13:48+0000\n"
+"PO-Revision-Date: 2026-11-26 14:12+0000\n"
 "Last-Translator: Henrik Schack <henrik@schack.dk>\n"
 "Language-Team: Danish\n"
 "Language: da_DK\n"
@@ -19,216 +20,228 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Domain: google-authenticator\n"
 
-#: google-authenticator.php:217 google-authenticator.php:220 google-authenticator.php:223
+#: google-authenticator.php:221 google-authenticator.php:224 google-authenticator.php:227
 msgid "Google Authenticator"
 msgstr "Google Authenticator"
 
-#: google-authenticator.php:327
+#: google-authenticator.php:335
 msgid "OTP code doesn't match supplied secret, please check you've configured Authenticator correctly."
 msgstr "Engangskoden passer ikke til den angivne hemmelige nøgle. Kontrollér, at du har sat godkendelsesappen korrekt op."
 
-#: google-authenticator.php:336
+#: google-authenticator.php:344
 msgid "Congratulations, you have successfully enabled Google Authenticator for your account"
 msgstr "Tillykke, du har aktiveret Google Authenticator for din konto"
 
-#: google-authenticator.php:351
+#: google-authenticator.php:359
 msgid "iOS: Google Authenticator"
 msgstr "iOS: Google Authenticator"
 
-#: google-authenticator.php:355
+#: google-authenticator.php:363
 msgid "Android: Google Authenticator"
 msgstr "Android: Google Authenticator"
 
-#: google-authenticator.php:359
+#: google-authenticator.php:367
 msgid "iOS: Microsoft Authenticator"
 msgstr "iOS: Microsoft Authenticator"
 
-#: google-authenticator.php:363
+#: google-authenticator.php:371
 msgid "Android: Microsoft Authenticator"
 msgstr "Android: Microsoft Authenticator"
 
-#: google-authenticator.php:367
+#: google-authenticator.php:375
 msgid "iOS: Authy"
 msgstr "iOS: Authy"
 
-#: google-authenticator.php:371
+#: google-authenticator.php:379
 msgid "Android: Authy"
 msgstr "Android: Authy"
 
-#: google-authenticator.php:378 google-authenticator.php:477 google-authenticator.php:974 google-authenticator.php:1207
+#: google-authenticator.php:386 google-authenticator.php:485 google-authenticator.php:1050 google-authenticator.php:1327
 msgid "Google Authenticator Settings"
 msgstr "Google Authenticator-indstillinger"
 
-#: google-authenticator.php:382
+#: google-authenticator.php:390
 msgid "If you haven't already done so, please install an authenticator app on your mobile device, for example:"
 msgstr "Hvis du ikke allerede har gjort det, så installer en godkendelsesapp på din mobilenhed, for eksempel:"
 
-#: google-authenticator.php:388
+#: google-authenticator.php:396
 msgid "The easiest way to enable your account is to add an account by scanning the QR code using the app."
 msgstr "Den nemmeste måde at aktivere din konto på er at tilføje en konto ved at scanne QR-koden med appen."
 
-#: google-authenticator.php:390
+#: google-authenticator.php:398
 msgid "An account can also be added by typing in the secret. After you've added your account to the App, please type the code you see on the screen into the Authenticator Code field and press the Verify Authenticator Code button."
 msgstr "Du kan også tilføje en konto ved at indtaste den hemmelige nøgle. Når du har tilføjet din konto i appen, skal du skrive koden, du ser på skærmen, i feltet Godkendelseskode og klikke på knappen Bekræft godkendelseskode."
 
-#: google-authenticator.php:393
+#: google-authenticator.php:401
 msgid "If the account setup was successful, you will be logged out, and will need to login again using your Username, Password and Authenticator code generated using the App on your mobile device."
 msgstr "Hvis kontoopsætningen lykkedes, bliver du logget ud og skal logge ind igen med dit brugernavn, din adgangskode og den godkendelseskode, appen på din mobilenhed genererer."
 
-#: google-authenticator.php:480
+#: google-authenticator.php:488
 msgid "Successfully saved your settings for the network"
 msgstr "Dine indstillinger for netværket er gemt"
 
-#: google-authenticator.php:482
+#: google-authenticator.php:490
 msgid "Successfully saved your settings for the site"
 msgstr "Dine indstillinger for webstedet er gemt"
 
-#: google-authenticator.php:487
+#: google-authenticator.php:495
 msgid "Network Settings"
 msgstr "Netværksindstillinger"
 
-#: google-authenticator.php:491
+#: google-authenticator.php:499
 msgid "Only use network-wide settings, ignoring site settings."
 msgstr "Brug kun indstillinger for hele netværket, og ignorer webstedets indstillinger."
 
-#: google-authenticator.php:497
+#: google-authenticator.php:505
 msgid "Two Screen Signin"
 msgstr "Login over to skærmbilleder"
 
-#: google-authenticator.php:501
+#: google-authenticator.php:509
 msgid "Ask for authenticator code on secondary login screen"
 msgstr "Spørg efter godkendelseskoden på et separat loginskærmbillede"
 
-#: google-authenticator.php:505
+#: google-authenticator.php:513
 msgid "Roles requiring Google Authenticator Enabled"
 msgstr "Roller, der kræver Google Authenticator"
 
-#: google-authenticator.php:513
+#: google-authenticator.php:519
+msgid "Super Admins"
+msgstr "Superadministratorer"
+
+#: google-authenticator.php:525
 msgid "Network-wide settings in effect, only a super admin can modify them."
 msgstr "Indstillinger for hele netværket er aktive. Kun en superadministrator kan ændre dem."
 
-#: google-authenticator.php:515
+#: google-authenticator.php:527
 msgid "Change network wide Google Authenticator settings"
 msgstr "Skift Google Authenticator-indstillinger for hele netværket"
 
-#: google-authenticator.php:555
+#: google-authenticator.php:567
 msgid "Sorry, you can't disable checks for this role as it's enabled at the network level."
 msgstr "Du kan desværre ikke slå kontrollen fra for denne rolle, da den er aktiveret på netværksniveau."
 
 #. translators: %s: URL of the network settings page
-#: google-authenticator.php:558
+#: google-authenticator.php:570
 #, php-format
 msgid "Sorry, this role is enabled at the network level and can only be disabled via the <a href=\"%s\">network settings</a>"
 msgstr "Denne rolle er desværre aktiveret på netværksniveau og kan kun deaktiveres via <a href=\"%s\">netværksindstillingerne</a>"
 
-#: google-authenticator.php:588
+#: google-authenticator.php:600
 msgid "If you don't have Google Authenticator enabled for your WordPress account, leave this field empty."
 msgstr "Hvis ikke du har aktiveret Google Authenticator for din konto, så lad være med at skrive noget her."
 
-#: google-authenticator.php:597 google-authenticator.php:601
+#: google-authenticator.php:609 google-authenticator.php:613
 msgid "Google Authenticator code"
 msgstr "Google Authenticator-kode"
 
-#: google-authenticator.php:701
+#: google-authenticator.php:629
+msgid "<strong>ERROR</strong>: Google Authenticator was not turned on. Add the site to your authenticator app by scanning the QR code, then enter the code the app shows."
+msgstr "<strong>FEJL</strong>: Google Authenticator blev ikke slået til. Tilføj webstedet i din godkendelsesapp ved at scanne QR-koden, og skriv derefter den kode, appen viser."
+
+#: google-authenticator.php:631
+msgid "<strong>ERROR</strong>: Your new Google Authenticator secret was not saved. Scan the new QR code with your authenticator app, then enter the code the app shows."
+msgstr "<strong>FEJL</strong>: Din nye hemmelige nøgle til Google Authenticator blev ikke gemt. Scan den nye QR-kode med din godkendelsesapp, og skriv derefter den kode, appen viser."
+
+#: google-authenticator.php:728
 msgid "<strong>ERROR</strong>: Please enter your Google Authenticator code."
 msgstr "<strong>FEJL</strong>: Indtast din Google Authenticator-kode."
 
-#: google-authenticator.php:703 google-authenticator.php:900
+#: google-authenticator.php:730 google-authenticator.php:963
 msgid "<strong>ERROR</strong>: The username, password or Google Authenticator code is incorrect, or the code has expired."
 msgstr "<strong>FEJL</strong>: Brugernavnet, adgangskoden eller Google Authenticator-koden er forkert, eller koden er udløbet."
 
-#: google-authenticator.php:715
+#: google-authenticator.php:742
 msgid "<strong>ERROR</strong>: The Google Authenticator password is incorrect."
 msgstr "<strong>FEJL</strong>: Google Authenticator-adgangskoden er forkert."
 
 #. translators: %d: number of minutes
-#: google-authenticator.php:831
+#: google-authenticator.php:874
 #, php-format
 msgid "<strong>ERROR</strong>: Too many incorrect Google Authenticator codes. Please try again in %d minute."
 msgid_plural "<strong>ERROR</strong>: Too many incorrect Google Authenticator codes. Please try again in %d minutes."
 msgstr[0] "<strong>FEJL</strong>: For mange forkerte Google Authenticator-koder. Prøv igen om %d minut."
 msgstr[1] "<strong>FEJL</strong>: For mange forkerte Google Authenticator-koder. Prøv igen om %d minutter."
 
-#: google-authenticator.php:895
+#: google-authenticator.php:958
 msgid "Secondary Login Screen"
 msgstr "Sekundært loginskærmbillede"
 
-#: google-authenticator.php:898
+#: google-authenticator.php:961
 msgid "<strong>ERROR</strong>: The Google Authenticator code is missing."
 msgstr "<strong>FEJL</strong>: Google Authenticator-koden mangler."
 
-#: google-authenticator.php:911
+#: google-authenticator.php:974
 msgid "Please enter the Google Authenticator code using the app on your device."
 msgstr "Indtast Google Authenticator-koden fra appen på din enhed."
 
-#: google-authenticator.php:913
+#: google-authenticator.php:976
 msgid "Log In"
 msgstr "Log ind"
 
-#: google-authenticator.php:981 google-authenticator.php:1219
+#: google-authenticator.php:1057 google-authenticator.php:1339
 msgid "Active"
 msgstr "Aktiv"
 
-#: google-authenticator.php:990
+#: google-authenticator.php:1066
 msgid "Relaxed mode"
 msgstr "Afslappet tilstand"
 
-#: google-authenticator.php:992
+#: google-authenticator.php:1068
 msgid " Relaxed mode allows for more time drifting on your phone clock (&#177;4 min)."
 msgstr " Afslappet tilstand tillader større afvigelse på din telefons ur (&#177;4 min)."
 
-#: google-authenticator.php:999
+#: google-authenticator.php:1075
 msgid "Description"
 msgstr "Beskrivelse"
 
-#: google-authenticator.php:1000
+#: google-authenticator.php:1076
 msgid " Description that you'll see in the Google Authenticator app on your phone."
 msgstr " Beskrivelsen du vil se i Google Authenticator app'en på din telefon."
 
-#: google-authenticator.php:1004
+#: google-authenticator.php:1080
 msgid "Secret"
 msgstr "Hemmelig nøgle"
 
-#: google-authenticator.php:1008
+#: google-authenticator.php:1084
 msgid "Create new secret"
 msgstr "Opret ny hemmelig nøgle"
 
-#: google-authenticator.php:1009
+#: google-authenticator.php:1085
 msgid "Show/Hide QR code"
 msgstr "Vis/skjul QR-kode"
 
-#: google-authenticator.php:1021
+#: google-authenticator.php:1097
 msgid "Scan this with the Google Authenticator app."
 msgstr "Scan dette med Google Authenticator app'en."
 
-#: google-authenticator.php:1033
-msgid "Enable App password"
-msgstr "Aktivér app-adgangskode"
-
-#: google-authenticator.php:1035
-msgid " Enabling an App password will decrease your overall login security."
-msgstr " Hvis du aktiverer en app-adgangskode, nedsættes din samlede loginsikkerhed."
-
-#: google-authenticator.php:1043
-msgid "Create new password"
-msgstr "Opret ny adgangskode"
-
-#: google-authenticator.php:1044
-msgid " Password is not stored in cleartext, this is your only chance to see it."
-msgstr " Adgangskoden gemmes ikke i klartekst. Dette er din eneste chance for at se den."
-
-#: google-authenticator.php:1052
+#: google-authenticator.php:1111 google-authenticator.php:1136
 msgid "Authenticator Code"
 msgstr "Godkendelseskode"
 
-#: google-authenticator.php:1053
+#: google-authenticator.php:1112 google-authenticator.php:1137
 msgid "After adding the site to your authenticator app, type the code it shows here."
 msgstr "Når du har tilføjet webstedet i din godkendelsesapp, skal du skrive den kode, appen viser, her."
 
-#: google-authenticator.php:1059
+#: google-authenticator.php:1117
+msgid "Enable App password"
+msgstr "Aktivér app-adgangskode"
+
+#: google-authenticator.php:1119
+msgid " Enabling an App password will decrease your overall login security."
+msgstr " Hvis du aktiverer en app-adgangskode, nedsættes din samlede loginsikkerhed."
+
+#: google-authenticator.php:1127
+msgid "Create new password"
+msgstr "Opret ny adgangskode"
+
+#: google-authenticator.php:1128
+msgid " Password is not stored in cleartext, this is your only chance to see it."
+msgstr " Adgangskoden gemmes ikke i klartekst. Dette er din eneste chance for at se den."
+
+#: google-authenticator.php:1143
 msgid "Verify Authenticator Code"
 msgstr "Bekræft godkendelseskode"
 
-#: google-authenticator.php:1212
+#: google-authenticator.php:1332
 msgid "Hide settings from user"
 msgstr "Skjul indstillinger for brugeren"

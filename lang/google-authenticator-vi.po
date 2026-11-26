@@ -2,13 +2,14 @@
 # Copyright (C) 2026 Ivan Kruchkoff
 # This file is distributed under the GPLv2 or later.
 # Version 0.58: missing strings added and errors corrected with machine-assisted (AI) translation.
+# Version 0.59: new strings translated the same way.
 # Corrections from native speakers are welcome at https://translate.wordpress.org/projects/wp-plugins/google-authenticator/
 msgid ""
 msgstr ""
-"Project-Id-Version: Google Authenticator 0.58\n"
+"Project-Id-Version: Google Authenticator 0.59\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/google-authenticator/\n"
-"POT-Creation-Date: 2026-11-26 12:31+0000\n"
-"PO-Revision-Date: 2026-11-26 12:41+0000\n"
+"POT-Creation-Date: 2026-11-26 13:48+0000\n"
+"PO-Revision-Date: 2026-11-26 14:12+0000\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi\n"
@@ -18,215 +19,227 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Domain: google-authenticator\n"
 
-#: google-authenticator.php:217 google-authenticator.php:220 google-authenticator.php:223
+#: google-authenticator.php:221 google-authenticator.php:224 google-authenticator.php:227
 msgid "Google Authenticator"
 msgstr "Google Authenticator"
 
-#: google-authenticator.php:327
+#: google-authenticator.php:335
 msgid "OTP code doesn't match supplied secret, please check you've configured Authenticator correctly."
 msgstr "Mã dùng một lần không khớp với khóa bí mật đã cung cấp. Vui lòng kiểm tra xem bạn đã thiết lập ứng dụng xác thực đúng cách chưa."
 
-#: google-authenticator.php:336
+#: google-authenticator.php:344
 msgid "Congratulations, you have successfully enabled Google Authenticator for your account"
 msgstr "Chúc mừng, bạn đã bật Google Authenticator cho tài khoản của mình"
 
-#: google-authenticator.php:351
+#: google-authenticator.php:359
 msgid "iOS: Google Authenticator"
 msgstr "iOS: Google Authenticator"
 
-#: google-authenticator.php:355
+#: google-authenticator.php:363
 msgid "Android: Google Authenticator"
 msgstr "Android: Google Authenticator"
 
-#: google-authenticator.php:359
+#: google-authenticator.php:367
 msgid "iOS: Microsoft Authenticator"
 msgstr "iOS: Microsoft Authenticator"
 
-#: google-authenticator.php:363
+#: google-authenticator.php:371
 msgid "Android: Microsoft Authenticator"
 msgstr "Android: Microsoft Authenticator"
 
-#: google-authenticator.php:367
+#: google-authenticator.php:375
 msgid "iOS: Authy"
 msgstr "iOS: Authy"
 
-#: google-authenticator.php:371
+#: google-authenticator.php:379
 msgid "Android: Authy"
 msgstr "Android: Authy"
 
-#: google-authenticator.php:378 google-authenticator.php:477 google-authenticator.php:974 google-authenticator.php:1207
+#: google-authenticator.php:386 google-authenticator.php:485 google-authenticator.php:1050 google-authenticator.php:1327
 msgid "Google Authenticator Settings"
 msgstr "Cài đặt Google Authenticator"
 
-#: google-authenticator.php:382
+#: google-authenticator.php:390
 msgid "If you haven't already done so, please install an authenticator app on your mobile device, for example:"
 msgstr "Nếu chưa làm, vui lòng cài đặt một ứng dụng xác thực trên thiết bị di động của bạn, ví dụ:"
 
-#: google-authenticator.php:388
+#: google-authenticator.php:396
 msgid "The easiest way to enable your account is to add an account by scanning the QR code using the app."
 msgstr "Cách dễ nhất để kích hoạt tài khoản là thêm tài khoản bằng cách quét mã QR bằng ứng dụng."
 
-#: google-authenticator.php:390
+#: google-authenticator.php:398
 msgid "An account can also be added by typing in the secret. After you've added your account to the App, please type the code you see on the screen into the Authenticator Code field and press the Verify Authenticator Code button."
 msgstr "Bạn cũng có thể thêm tài khoản bằng cách nhập khóa bí mật. Sau khi thêm tài khoản vào ứng dụng, hãy nhập mã hiển thị trên màn hình vào trường Mã xác thực và nhấn nút Xác minh mã xác thực."
 
-#: google-authenticator.php:393
+#: google-authenticator.php:401
 msgid "If the account setup was successful, you will be logged out, and will need to login again using your Username, Password and Authenticator code generated using the App on your mobile device."
 msgstr "Nếu thiết lập tài khoản thành công, bạn sẽ bị đăng xuất và cần đăng nhập lại bằng tên người dùng, mật khẩu và mã xác thực do ứng dụng trên thiết bị di động của bạn tạo ra."
 
-#: google-authenticator.php:480
+#: google-authenticator.php:488
 msgid "Successfully saved your settings for the network"
 msgstr "Đã lưu cài đặt mạng thành công"
 
-#: google-authenticator.php:482
+#: google-authenticator.php:490
 msgid "Successfully saved your settings for the site"
 msgstr "Đã lưu cài đặt trang web thành công"
 
-#: google-authenticator.php:487
+#: google-authenticator.php:495
 msgid "Network Settings"
 msgstr "Cài đặt mạng"
 
-#: google-authenticator.php:491
+#: google-authenticator.php:499
 msgid "Only use network-wide settings, ignoring site settings."
 msgstr "Chỉ dùng cài đặt cho toàn mạng, bỏ qua cài đặt của trang web."
 
-#: google-authenticator.php:497
+#: google-authenticator.php:505
 msgid "Two Screen Signin"
 msgstr "Đăng nhập hai màn hình"
 
-#: google-authenticator.php:501
+#: google-authenticator.php:509
 msgid "Ask for authenticator code on secondary login screen"
 msgstr "Yêu cầu mã xác thực ở màn hình đăng nhập thứ hai"
 
-#: google-authenticator.php:505
+#: google-authenticator.php:513
 msgid "Roles requiring Google Authenticator Enabled"
 msgstr "Các vai trò bắt buộc dùng Google Authenticator"
 
-#: google-authenticator.php:513
+#: google-authenticator.php:519
+msgid "Super Admins"
+msgstr "Siêu quản trị viên"
+
+#: google-authenticator.php:525
 msgid "Network-wide settings in effect, only a super admin can modify them."
 msgstr "Đang áp dụng cài đặt toàn mạng, chỉ quản trị viên cấp cao mới có thể thay đổi."
 
-#: google-authenticator.php:515
+#: google-authenticator.php:527
 msgid "Change network wide Google Authenticator settings"
 msgstr "Thay đổi cài đặt Google Authenticator cho toàn mạng"
 
-#: google-authenticator.php:555
+#: google-authenticator.php:567
 msgid "Sorry, you can't disable checks for this role as it's enabled at the network level."
 msgstr "Rất tiếc, bạn không thể tắt kiểm tra cho vai trò này vì nó đã được bật ở cấp mạng."
 
 #. translators: %s: URL of the network settings page
-#: google-authenticator.php:558
+#: google-authenticator.php:570
 #, php-format
 msgid "Sorry, this role is enabled at the network level and can only be disabled via the <a href=\"%s\">network settings</a>"
 msgstr "Rất tiếc, vai trò này đã được bật ở cấp mạng và chỉ có thể tắt trong <a href=\"%s\">cài đặt mạng</a>"
 
-#: google-authenticator.php:588
+#: google-authenticator.php:600
 msgid "If you don't have Google Authenticator enabled for your WordPress account, leave this field empty."
 msgstr "Nếu bạn chưa bật Google Authenticator cho tài khoản WordPress của mình, hãy để trống trường này."
 
-#: google-authenticator.php:597 google-authenticator.php:601
+#: google-authenticator.php:609 google-authenticator.php:613
 msgid "Google Authenticator code"
 msgstr "Mã Google Authenticator"
 
-#: google-authenticator.php:701
+#: google-authenticator.php:629
+msgid "<strong>ERROR</strong>: Google Authenticator was not turned on. Add the site to your authenticator app by scanning the QR code, then enter the code the app shows."
+msgstr "<strong>LỖI</strong>: Google Authenticator chưa được bật. Hãy thêm trang web vào ứng dụng xác thực bằng cách quét mã QR, sau đó nhập mã mà ứng dụng hiển thị."
+
+#: google-authenticator.php:631
+msgid "<strong>ERROR</strong>: Your new Google Authenticator secret was not saved. Scan the new QR code with your authenticator app, then enter the code the app shows."
+msgstr "<strong>LỖI</strong>: Khóa bí mật Google Authenticator mới của bạn chưa được lưu. Hãy quét mã QR mới bằng ứng dụng xác thực, sau đó nhập mã mà ứng dụng hiển thị."
+
+#: google-authenticator.php:728
 msgid "<strong>ERROR</strong>: Please enter your Google Authenticator code."
 msgstr "<strong>LỖI</strong>: Vui lòng nhập mã Google Authenticator của bạn."
 
-#: google-authenticator.php:703 google-authenticator.php:900
+#: google-authenticator.php:730 google-authenticator.php:963
 msgid "<strong>ERROR</strong>: The username, password or Google Authenticator code is incorrect, or the code has expired."
 msgstr "<strong>LỖI</strong>: Tên người dùng, mật khẩu hoặc mã Google Authenticator không đúng, hoặc mã đã hết hạn."
 
-#: google-authenticator.php:715
+#: google-authenticator.php:742
 msgid "<strong>ERROR</strong>: The Google Authenticator password is incorrect."
 msgstr "<strong>LỖI</strong>: Mật khẩu Google Authenticator không đúng."
 
 #. translators: %d: number of minutes
-#: google-authenticator.php:831
+#: google-authenticator.php:874
 #, php-format
 msgid "<strong>ERROR</strong>: Too many incorrect Google Authenticator codes. Please try again in %d minute."
 msgid_plural "<strong>ERROR</strong>: Too many incorrect Google Authenticator codes. Please try again in %d minutes."
 msgstr[0] "<strong>LỖI</strong>: Bạn đã nhập sai mã Google Authenticator quá nhiều lần. Vui lòng thử lại sau %d phút."
 
-#: google-authenticator.php:895
+#: google-authenticator.php:958
 msgid "Secondary Login Screen"
 msgstr "Màn hình đăng nhập thứ hai"
 
-#: google-authenticator.php:898
+#: google-authenticator.php:961
 msgid "<strong>ERROR</strong>: The Google Authenticator code is missing."
 msgstr "<strong>LỖI</strong>: Thiếu mã Google Authenticator."
 
-#: google-authenticator.php:911
+#: google-authenticator.php:974
 msgid "Please enter the Google Authenticator code using the app on your device."
 msgstr "Vui lòng nhập mã Google Authenticator từ ứng dụng trên thiết bị của bạn."
 
-#: google-authenticator.php:913
+#: google-authenticator.php:976
 msgid "Log In"
 msgstr "Đăng nhập"
 
-#: google-authenticator.php:981 google-authenticator.php:1219
+#: google-authenticator.php:1057 google-authenticator.php:1339
 msgid "Active"
 msgstr "Bật"
 
-#: google-authenticator.php:990
+#: google-authenticator.php:1066
 msgid "Relaxed mode"
 msgstr "Chế độ nới lỏng"
 
-#: google-authenticator.php:992
+#: google-authenticator.php:1068
 msgid " Relaxed mode allows for more time drifting on your phone clock (&#177;4 min)."
 msgstr " Chế độ nới lỏng cho phép đồng hồ trên điện thoại của bạn lệch nhiều hơn (&#177;4 phút)."
 
-#: google-authenticator.php:999
+#: google-authenticator.php:1075
 msgid "Description"
 msgstr "Mô tả"
 
-#: google-authenticator.php:1000
+#: google-authenticator.php:1076
 msgid " Description that you'll see in the Google Authenticator app on your phone."
 msgstr " Mô tả bạn sẽ thấy trong ứng dụng Google Authenticator trên điện thoại."
 
-#: google-authenticator.php:1004
+#: google-authenticator.php:1080
 msgid "Secret"
 msgstr "Khóa bí mật"
 
-#: google-authenticator.php:1008
+#: google-authenticator.php:1084
 msgid "Create new secret"
 msgstr "Tạo khóa bí mật mới"
 
-#: google-authenticator.php:1009
+#: google-authenticator.php:1085
 msgid "Show/Hide QR code"
 msgstr "Hiện/Ẩn mã QR"
 
-#: google-authenticator.php:1021
+#: google-authenticator.php:1097
 msgid "Scan this with the Google Authenticator app."
 msgstr "Quét mã này bằng ứng dụng Google Authenticator."
 
-#: google-authenticator.php:1033
-msgid "Enable App password"
-msgstr "Bật mật khẩu ứng dụng"
-
-#: google-authenticator.php:1035
-msgid " Enabling an App password will decrease your overall login security."
-msgstr " Bật mật khẩu ứng dụng sẽ làm giảm mức bảo mật đăng nhập tổng thể của bạn."
-
-#: google-authenticator.php:1043
-msgid "Create new password"
-msgstr "Tạo mật khẩu mới"
-
-#: google-authenticator.php:1044
-msgid " Password is not stored in cleartext, this is your only chance to see it."
-msgstr " Mật khẩu không được lưu dưới dạng văn bản thuần, đây là cơ hội duy nhất để bạn xem nó."
-
-#: google-authenticator.php:1052
+#: google-authenticator.php:1111 google-authenticator.php:1136
 msgid "Authenticator Code"
 msgstr "Mã xác thực"
 
-#: google-authenticator.php:1053
+#: google-authenticator.php:1112 google-authenticator.php:1137
 msgid "After adding the site to your authenticator app, type the code it shows here."
 msgstr "Sau khi thêm trang web vào ứng dụng xác thực, hãy nhập mã mà ứng dụng hiển thị vào đây."
 
-#: google-authenticator.php:1059
+#: google-authenticator.php:1117
+msgid "Enable App password"
+msgstr "Bật mật khẩu ứng dụng"
+
+#: google-authenticator.php:1119
+msgid " Enabling an App password will decrease your overall login security."
+msgstr " Bật mật khẩu ứng dụng sẽ làm giảm mức bảo mật đăng nhập tổng thể của bạn."
+
+#: google-authenticator.php:1127
+msgid "Create new password"
+msgstr "Tạo mật khẩu mới"
+
+#: google-authenticator.php:1128
+msgid " Password is not stored in cleartext, this is your only chance to see it."
+msgstr " Mật khẩu không được lưu dưới dạng văn bản thuần, đây là cơ hội duy nhất để bạn xem nó."
+
+#: google-authenticator.php:1143
 msgid "Verify Authenticator Code"
 msgstr "Xác minh mã xác thực"
 
-#: google-authenticator.php:1212
+#: google-authenticator.php:1332
 msgid "Hide settings from user"
 msgstr "Ẩn cài đặt khỏi người dùng"
