@@ -305,7 +305,7 @@ function save_submitted_setup_page() {
 	}
 
 	$secret = isset( $_POST['GA_secret'] ) && is_string( $_POST['GA_secret'] ) ? strtoupper( sanitize_text_field( wp_unslash( $_POST['GA_secret'] ) ) ) : '';
-	$otp    = isset( $_POST['GA_otp_code'] ) && is_string( $_POST['GA_otp_code'] ) ? preg_replace( '/\s+/', '', sanitize_text_field( wp_unslash( $_POST['GA_otp_code'] ) ) ) : '';
+	$otp    = isset( $_POST['GA_otp_code'] ) && is_string( $_POST['GA_otp_code'] ) ? $this->normalize_otp( sanitize_text_field( wp_unslash( $_POST['GA_otp_code'] ) ) ) : '';
 	if ( ! $this->is_valid_secret( $secret ) || '' === $otp ) {
 		return;
 	}
@@ -756,10 +756,26 @@ function get_submitted_otp() {
 		return '';
 	}
 	// phpcs:ignore WordPress.Security.NonceVerification.Missing
-	$otp = sanitize_text_field( wp_unslash( $_POST['googleotp'] ) );
-	// Accept full-width digits and spaces, as typed with a Japanese / Chinese / Korean input method.
-	$otp = strtr( $otp, array( '０' => '0', '１' => '1', '２' => '2', '３' => '3', '４' => '4', '５' => '5', '６' => '6', '７' => '7', '８' => '8', '９' => '9', '　' => ' ' ) );
-	return preg_replace( '/\s+/', '', $otp );
+	return $this->normalize_otp( sanitize_text_field( wp_unslash( $_POST['googleotp'] ) ) );
+}
+
+/**
+ * Tidy up a verification code as typed or pasted by the user.
+ *
+ * Authenticator apps often show codes in two groups ("012 345"), and copying them can bring
+ * along a space, a no-break or thin space, an invisible zero-width character, a dash or a dot.
+ * All of these are removed. Letters and other characters are left in place, so the code is
+ * rejected by verify() rather than silently changed into a different number.
+ *
+ * @param string $otp Code as submitted.
+ * @return string
+ */
+function normalize_otp( $otp ) {
+	// Full-width digits and spaces, as typed with a Japanese / Chinese / Korean input method.
+	$otp = strtr( (string) $otp, array( '０' => '0', '１' => '1', '２' => '2', '３' => '3', '４' => '4', '５' => '5', '６' => '6', '７' => '7', '８' => '8', '９' => '9' ) );
+	// Spaces of any kind (\s, \p{Z}), invisible formatting characters (\p{Cf}), dashes (\p{Pd}) and dots.
+	$otp = preg_replace( '/[\s\p{Z}\p{Cf}\p{Pd}.·・]+/u', '', $otp );
+	return is_string( $otp ) ? $otp : ''; // preg_replace() returns null for invalid UTF-8.
 }
 
 /**

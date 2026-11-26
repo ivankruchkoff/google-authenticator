@@ -123,6 +123,7 @@ Yes. The replay protection isn't compatible with the test/setup mode of the "Sto
 * Login form: the cursor now starts in the username field, as on a normal WordPress login, instead of jumping to the code field. On the two-screen sign-in page it still starts in the code field.
 * Login form: a wrong code shakes the form, like a wrong password does.
 * Codes typed with full-width digits (for example with a Japanese input method) are now accepted in every browser.
+* Codes copied from an authenticator app are now accepted with any separator between the digits, such as "012 345", "012-345" or the no-break and thin spaces some apps and phones insert. Previously any space made a valid code fail.
 * Fixed the QR code for descriptions or site names with non-English characters. They were encoded incorrectly, so authenticator apps could show a garbled name or reject the code.
 * Fixed the setup page not sending users who already have two-factor authentication enabled back to the dashboard.
 * Updated the list of authenticator apps on the setup page (Google Authenticator, Microsoft Authenticator and Authy) and removed discontinued ones.
