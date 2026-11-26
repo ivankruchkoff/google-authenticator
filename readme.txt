@@ -3,7 +3,7 @@ Contributors: ivankk
 Tags: authentication,otp,password,security,login
 Requires at least: 4.5
 Tested up to: 7.1
-Stable tag: 0.57
+Stable tag: 0.58
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,17 @@ please remember to remove the "Check credentials on all login attempts" checkmar
 4. Google Authenticator app on Android
 
 == Changelog ==
+= 0.58 =
+* Security: Wrong verification codes are now rate limited. After 5 wrong codes sent with the correct password, further attempts are blocked for 1 minute, doubling up to 1 hour. Previously the 6 digit code could be brute-forced by anyone who knew the password.
+* Security: The verification code is only checked once the password is correct, and a wrong password and a wrong code now return the same error.
+* Security: The 2FA secret shown on the setup and profile pages can no longer be set from a link (secret fixation).
+* Security: Mandatory 2FA now applies when any of a user's roles requires it, not only their first role.
+* Security: The setup page can no longer replace the secret of an account that already has 2FA enabled.
+* Security: Errors from other login checks (lockout or captcha plugins) are no longer overridden by App password logins.
+* Hardening: Stricter validation of verification codes and secrets, input unslashing and output escaping throughout.
+* Fixed two screen sign-in for passwords containing quotes or backslashes.
+* Fixed site settings on multisite being editable only when network-wide settings were enforced (the reverse of what was intended).
+
 = 0.57 =
 * Security: Fixed an authentication bypass where an empty app password could be accepted over XML-RPC (CVE-2026-88759). Thanks to Kuba (Wordfence).
 * Saving the profile no longer stores an app password unless one has actually been generated.
