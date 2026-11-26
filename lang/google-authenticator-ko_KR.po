@@ -1,0 +1,232 @@
+# Korean translation of the Google Authenticator WordPress plugin.
+# Copyright (C) 2026 Ivan Kruchkoff
+# This file is distributed under the GPLv2 or later.
+# Version 0.58: missing strings added and errors corrected with machine-assisted (AI) translation.
+# Corrections from native speakers are welcome at https://translate.wordpress.org/projects/wp-plugins/google-authenticator/
+msgid ""
+msgstr ""
+"Project-Id-Version: Google Authenticator 0.58\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/google-authenticator/\n"
+"POT-Creation-Date: 2026-11-26 12:31+0000\n"
+"PO-Revision-Date: 2026-11-26 12:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: Korean\n"
+"Language: ko_KR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Domain: google-authenticator\n"
+
+#: google-authenticator.php:217 google-authenticator.php:220 google-authenticator.php:223
+msgid "Google Authenticator"
+msgstr "Google Authenticator"
+
+#: google-authenticator.php:327
+msgid "OTP code doesn't match supplied secret, please check you've configured Authenticator correctly."
+msgstr "일회용 코드가 입력한 비밀 키와 일치하지 않습니다. 인증 앱을 올바르게 설정했는지 확인하세요."
+
+#: google-authenticator.php:336
+msgid "Congratulations, you have successfully enabled Google Authenticator for your account"
+msgstr "축하합니다. 계정에 Google Authenticator가 활성화되었습니다"
+
+#: google-authenticator.php:351
+msgid "iOS: Google Authenticator"
+msgstr "iOS: Google Authenticator"
+
+#: google-authenticator.php:355
+msgid "Android: Google Authenticator"
+msgstr "Android: Google Authenticator"
+
+#: google-authenticator.php:359
+msgid "iOS: Microsoft Authenticator"
+msgstr "iOS: Microsoft Authenticator"
+
+#: google-authenticator.php:363
+msgid "Android: Microsoft Authenticator"
+msgstr "Android: Microsoft Authenticator"
+
+#: google-authenticator.php:367
+msgid "iOS: Authy"
+msgstr "iOS: Authy"
+
+#: google-authenticator.php:371
+msgid "Android: Authy"
+msgstr "Android: Authy"
+
+#: google-authenticator.php:378 google-authenticator.php:477 google-authenticator.php:974 google-authenticator.php:1207
+msgid "Google Authenticator Settings"
+msgstr "Google Authenticator 설정"
+
+#: google-authenticator.php:382
+msgid "If you haven't already done so, please install an authenticator app on your mobile device, for example:"
+msgstr "아직 설치하지 않았다면 모바일 기기에 인증 앱을 설치하세요. 예:"
+
+#: google-authenticator.php:388
+msgid "The easiest way to enable your account is to add an account by scanning the QR code using the app."
+msgstr "계정을 활성화하는 가장 쉬운 방법은 앱으로 QR 코드를 스캔하여 계정을 추가하는 것입니다."
+
+#: google-authenticator.php:390
+msgid "An account can also be added by typing in the secret. After you've added your account to the App, please type the code you see on the screen into the Authenticator Code field and press the Verify Authenticator Code button."
+msgstr "비밀 키를 입력하여 계정을 추가할 수도 있습니다. 앱에 계정을 추가한 후 화면에 표시된 코드를 인증 코드 필드에 입력하고 인증 코드 확인 버튼을 누르세요."
+
+#: google-authenticator.php:393
+msgid "If the account setup was successful, you will be logged out, and will need to login again using your Username, Password and Authenticator code generated using the App on your mobile device."
+msgstr "계정 설정에 성공하면 로그아웃되며, 사용자명, 비밀번호 및 모바일 기기의 앱에서 생성된 인증 코드로 다시 로그인해야 합니다."
+
+#: google-authenticator.php:480
+msgid "Successfully saved your settings for the network"
+msgstr "네트워크 설정을 저장했습니다"
+
+#: google-authenticator.php:482
+msgid "Successfully saved your settings for the site"
+msgstr "사이트 설정을 저장했습니다"
+
+#: google-authenticator.php:487
+msgid "Network Settings"
+msgstr "네트워크 설정"
+
+#: google-authenticator.php:491
+msgid "Only use network-wide settings, ignoring site settings."
+msgstr "사이트 설정은 무시하고 네트워크 전체 설정만 사용합니다."
+
+#: google-authenticator.php:497
+msgid "Two Screen Signin"
+msgstr "두 화면 로그인"
+
+#: google-authenticator.php:501
+msgid "Ask for authenticator code on secondary login screen"
+msgstr "두 번째 로그인 화면에서 인증 코드 요청"
+
+#: google-authenticator.php:505
+msgid "Roles requiring Google Authenticator Enabled"
+msgstr "Google Authenticator가 필요한 역할"
+
+#: google-authenticator.php:513
+msgid "Network-wide settings in effect, only a super admin can modify them."
+msgstr "네트워크 전체 설정이 적용 중입니다. 슈퍼 관리자만 변경할 수 있습니다."
+
+#: google-authenticator.php:515
+msgid "Change network wide Google Authenticator settings"
+msgstr "네트워크 전체 Google Authenticator 설정 변경"
+
+#: google-authenticator.php:555
+msgid "Sorry, you can't disable checks for this role as it's enabled at the network level."
+msgstr "죄송합니다. 이 역할은 네트워크 수준에서 활성화되어 있으므로 확인을 비활성화할 수 없습니다."
+
+#. translators: %s: URL of the network settings page
+#: google-authenticator.php:558
+#, php-format
+msgid "Sorry, this role is enabled at the network level and can only be disabled via the <a href=\"%s\">network settings</a>"
+msgstr "죄송합니다. 이 역할은 네트워크 수준에서 활성화되어 있으며 <a href=\"%s\">네트워크 설정</a>에서만 비활성화할 수 있습니다"
+
+#: google-authenticator.php:588
+msgid "If you don't have Google Authenticator enabled for your WordPress account, leave this field empty."
+msgstr "워드프레스 계정에 Google Authenticator를 활성화하지 않았다면 이 필드를 비워 두세요."
+
+#: google-authenticator.php:597 google-authenticator.php:601
+msgid "Google Authenticator code"
+msgstr "Google Authenticator 코드"
+
+#: google-authenticator.php:701
+msgid "<strong>ERROR</strong>: Please enter your Google Authenticator code."
+msgstr "<strong>오류</strong>: Google Authenticator 코드를 입력하세요."
+
+#: google-authenticator.php:703 google-authenticator.php:900
+msgid "<strong>ERROR</strong>: The username, password or Google Authenticator code is incorrect, or the code has expired."
+msgstr "<strong>오류</strong>: 사용자명, 비밀번호 또는 Google Authenticator 코드가 올바르지 않거나 코드가 만료되었습니다."
+
+#: google-authenticator.php:715
+msgid "<strong>ERROR</strong>: The Google Authenticator password is incorrect."
+msgstr "<strong>오류</strong>: Google Authenticator 비밀번호가 올바르지 않습니다."
+
+#. translators: %d: number of minutes
+#: google-authenticator.php:831
+#, php-format
+msgid "<strong>ERROR</strong>: Too many incorrect Google Authenticator codes. Please try again in %d minute."
+msgid_plural "<strong>ERROR</strong>: Too many incorrect Google Authenticator codes. Please try again in %d minutes."
+msgstr[0] "<strong>오류</strong>: 잘못된 Google Authenticator 코드를 너무 많이 입력했습니다. %d분 후에 다시 시도하세요."
+
+#: google-authenticator.php:895
+msgid "Secondary Login Screen"
+msgstr "두 번째 로그인 화면"
+
+#: google-authenticator.php:898
+msgid "<strong>ERROR</strong>: The Google Authenticator code is missing."
+msgstr "<strong>오류</strong>: Google Authenticator 코드가 없습니다."
+
+#: google-authenticator.php:911
+msgid "Please enter the Google Authenticator code using the app on your device."
+msgstr "기기의 앱에 표시된 Google Authenticator 코드를 입력하세요."
+
+#: google-authenticator.php:913
+msgid "Log In"
+msgstr "로그인"
+
+#: google-authenticator.php:981 google-authenticator.php:1219
+msgid "Active"
+msgstr "활성"
+
+#: google-authenticator.php:990
+msgid "Relaxed mode"
+msgstr "완화 모드"
+
+#: google-authenticator.php:992
+msgid " Relaxed mode allows for more time drifting on your phone clock (&#177;4 min)."
+msgstr " 완화 모드는 휴대폰 시계의 시간 차이를 더 넓게 허용합니다(&#177;4분)."
+
+#: google-authenticator.php:999
+msgid "Description"
+msgstr "설명"
+
+#: google-authenticator.php:1000
+msgid " Description that you'll see in the Google Authenticator app on your phone."
+msgstr " 휴대폰의 Google Authenticator 앱에 표시될 설명입니다."
+
+#: google-authenticator.php:1004
+msgid "Secret"
+msgstr "비밀 키"
+
+#: google-authenticator.php:1008
+msgid "Create new secret"
+msgstr "새 비밀 키 만들기"
+
+#: google-authenticator.php:1009
+msgid "Show/Hide QR code"
+msgstr "QR 코드 보기/숨기기"
+
+#: google-authenticator.php:1021
+msgid "Scan this with the Google Authenticator app."
+msgstr "Google Authenticator 앱으로 스캔하세요."
+
+#: google-authenticator.php:1033
+msgid "Enable App password"
+msgstr "앱 비밀번호 활성화"
+
+#: google-authenticator.php:1035
+msgid " Enabling an App password will decrease your overall login security."
+msgstr " 앱 비밀번호를 활성화하면 전체 로그인 보안이 낮아집니다."
+
+#: google-authenticator.php:1043
+msgid "Create new password"
+msgstr "새 비밀번호 만들기"
+
+#: google-authenticator.php:1044
+msgid " Password is not stored in cleartext, this is your only chance to see it."
+msgstr " 비밀번호는 평문으로 저장되지 않으므로 지금만 확인할 수 있습니다."
+
+#: google-authenticator.php:1052
+msgid "Authenticator Code"
+msgstr "인증 코드"
+
+#: google-authenticator.php:1053
+msgid "After adding the site to your authenticator app, type the code it shows here."
+msgstr "인증 앱에 사이트를 추가한 후 앱에 표시된 코드를 여기에 입력하세요."
+
+#: google-authenticator.php:1059
+msgid "Verify Authenticator Code"
+msgstr "인증 코드 확인"
+
+#: google-authenticator.php:1212
+msgid "Hide settings from user"
+msgstr "사용자에게 설정 숨기기"

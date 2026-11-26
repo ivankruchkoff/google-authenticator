@@ -1,0 +1,234 @@
+# Ukrainian translation of the Google Authenticator WordPress plugin.
+# Copyright (C) 2026 Ivan Kruchkoff
+# This file is distributed under the GPLv2 or later.
+# Version 0.58: missing strings added and errors corrected with machine-assisted (AI) translation.
+# Corrections from native speakers are welcome at https://translate.wordpress.org/projects/wp-plugins/google-authenticator/
+msgid ""
+msgstr ""
+"Project-Id-Version: Google Authenticator 0.58\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/google-authenticator/\n"
+"POT-Creation-Date: 2026-11-26 12:31+0000\n"
+"PO-Revision-Date: 2026-11-26 12:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: Ukrainian\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : ((n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? 1 : 2);\n"
+"X-Domain: google-authenticator\n"
+
+#: google-authenticator.php:217 google-authenticator.php:220 google-authenticator.php:223
+msgid "Google Authenticator"
+msgstr "Google Authenticator"
+
+#: google-authenticator.php:327
+msgid "OTP code doesn't match supplied secret, please check you've configured Authenticator correctly."
+msgstr "Одноразовий код не відповідає вказаному секретному ключу. Перевірте, чи правильно налаштовано застосунок-автентифікатор."
+
+#: google-authenticator.php:336
+msgid "Congratulations, you have successfully enabled Google Authenticator for your account"
+msgstr "Вітаємо! Google Authenticator увімкнено для вашого облікового запису"
+
+#: google-authenticator.php:351
+msgid "iOS: Google Authenticator"
+msgstr "iOS: Google Authenticator"
+
+#: google-authenticator.php:355
+msgid "Android: Google Authenticator"
+msgstr "Android: Google Authenticator"
+
+#: google-authenticator.php:359
+msgid "iOS: Microsoft Authenticator"
+msgstr "iOS: Microsoft Authenticator"
+
+#: google-authenticator.php:363
+msgid "Android: Microsoft Authenticator"
+msgstr "Android: Microsoft Authenticator"
+
+#: google-authenticator.php:367
+msgid "iOS: Authy"
+msgstr "iOS: Authy"
+
+#: google-authenticator.php:371
+msgid "Android: Authy"
+msgstr "Android: Authy"
+
+#: google-authenticator.php:378 google-authenticator.php:477 google-authenticator.php:974 google-authenticator.php:1207
+msgid "Google Authenticator Settings"
+msgstr "Налаштування Google Authenticator"
+
+#: google-authenticator.php:382
+msgid "If you haven't already done so, please install an authenticator app on your mobile device, for example:"
+msgstr "Якщо ви ще цього не зробили, встановіть на мобільний пристрій застосунок-автентифікатор, наприклад:"
+
+#: google-authenticator.php:388
+msgid "The easiest way to enable your account is to add an account by scanning the QR code using the app."
+msgstr "Найпростіше увімкнути обліковий запис, додавши його в застосунок за допомогою сканування QR-коду."
+
+#: google-authenticator.php:390
+msgid "An account can also be added by typing in the secret. After you've added your account to the App, please type the code you see on the screen into the Authenticator Code field and press the Verify Authenticator Code button."
+msgstr "Обліковий запис також можна додати, ввівши секретний ключ вручну. Після додавання облікового запису в застосунок введіть показаний на екрані код у поле «Код автентифікатора» і натисніть кнопку «Перевірити код автентифікатора»."
+
+#: google-authenticator.php:393
+msgid "If the account setup was successful, you will be logged out, and will need to login again using your Username, Password and Authenticator code generated using the App on your mobile device."
+msgstr "Якщо налаштування пройшло успішно, ви вийдете з системи, і вам потрібно буде знову увійти, використовуючи ім’я користувача, пароль і код автентифікатора, створений застосунком на мобільному пристрої."
+
+#: google-authenticator.php:480
+msgid "Successfully saved your settings for the network"
+msgstr "Налаштування мережі успішно збережено"
+
+#: google-authenticator.php:482
+msgid "Successfully saved your settings for the site"
+msgstr "Налаштування сайту успішно збережено"
+
+#: google-authenticator.php:487
+msgid "Network Settings"
+msgstr "Налаштування мережі"
+
+#: google-authenticator.php:491
+msgid "Only use network-wide settings, ignoring site settings."
+msgstr "Використовувати лише налаштування для всієї мережі, ігноруючи налаштування сайту."
+
+#: google-authenticator.php:497
+msgid "Two Screen Signin"
+msgstr "Вхід на двох екранах"
+
+#: google-authenticator.php:501
+msgid "Ask for authenticator code on secondary login screen"
+msgstr "Запитувати код автентифікатора на окремому екрані входу"
+
+#: google-authenticator.php:505
+msgid "Roles requiring Google Authenticator Enabled"
+msgstr "Ролі, для яких потрібен Google Authenticator"
+
+#: google-authenticator.php:513
+msgid "Network-wide settings in effect, only a super admin can modify them."
+msgstr "Діють налаштування для всієї мережі, змінити їх може лише суперадміністратор."
+
+#: google-authenticator.php:515
+msgid "Change network wide Google Authenticator settings"
+msgstr "Змінити налаштування Google Authenticator для всієї мережі"
+
+#: google-authenticator.php:555
+msgid "Sorry, you can't disable checks for this role as it's enabled at the network level."
+msgstr "На жаль, ви не можете вимкнути перевірку для цієї ролі, оскільки її увімкнено на рівні мережі."
+
+#. translators: %s: URL of the network settings page
+#: google-authenticator.php:558
+#, php-format
+msgid "Sorry, this role is enabled at the network level and can only be disabled via the <a href=\"%s\">network settings</a>"
+msgstr "На жаль, цю роль увімкнено на рівні мережі, і її можна вимкнути лише в <a href=\"%s\">налаштуваннях мережі</a>"
+
+#: google-authenticator.php:588
+msgid "If you don't have Google Authenticator enabled for your WordPress account, leave this field empty."
+msgstr "Якщо для вашого облікового запису WordPress не увімкнено Google Authenticator, залиште це поле порожнім."
+
+#: google-authenticator.php:597 google-authenticator.php:601
+msgid "Google Authenticator code"
+msgstr "Код Google Authenticator"
+
+#: google-authenticator.php:701
+msgid "<strong>ERROR</strong>: Please enter your Google Authenticator code."
+msgstr "<strong>ПОМИЛКА</strong>: Введіть код Google Authenticator."
+
+#: google-authenticator.php:703 google-authenticator.php:900
+msgid "<strong>ERROR</strong>: The username, password or Google Authenticator code is incorrect, or the code has expired."
+msgstr "<strong>ПОМИЛКА</strong>: Неправильне ім’я користувача, пароль або код Google Authenticator, або термін дії коду минув."
+
+#: google-authenticator.php:715
+msgid "<strong>ERROR</strong>: The Google Authenticator password is incorrect."
+msgstr "<strong>ПОМИЛКА</strong>: Неправильний пароль Google Authenticator."
+
+#. translators: %d: number of minutes
+#: google-authenticator.php:831
+#, php-format
+msgid "<strong>ERROR</strong>: Too many incorrect Google Authenticator codes. Please try again in %d minute."
+msgid_plural "<strong>ERROR</strong>: Too many incorrect Google Authenticator codes. Please try again in %d minutes."
+msgstr[0] "<strong>ПОМИЛКА</strong>: Забагато неправильних кодів Google Authenticator. Повторіть спробу через %d хвилину."
+msgstr[1] "<strong>ПОМИЛКА</strong>: Забагато неправильних кодів Google Authenticator. Повторіть спробу через %d хвилини."
+msgstr[2] "<strong>ПОМИЛКА</strong>: Забагато неправильних кодів Google Authenticator. Повторіть спробу через %d хвилин."
+
+#: google-authenticator.php:895
+msgid "Secondary Login Screen"
+msgstr "Додатковий екран входу"
+
+#: google-authenticator.php:898
+msgid "<strong>ERROR</strong>: The Google Authenticator code is missing."
+msgstr "<strong>ПОМИЛКА</strong>: Не вказано код Google Authenticator."
+
+#: google-authenticator.php:911
+msgid "Please enter the Google Authenticator code using the app on your device."
+msgstr "Введіть код Google Authenticator із застосунку на вашому пристрої."
+
+#: google-authenticator.php:913
+msgid "Log In"
+msgstr "Увійти"
+
+#: google-authenticator.php:981 google-authenticator.php:1219
+msgid "Active"
+msgstr "Увімкнено"
+
+#: google-authenticator.php:990
+msgid "Relaxed mode"
+msgstr "М’який режим"
+
+#: google-authenticator.php:992
+msgid " Relaxed mode allows for more time drifting on your phone clock (&#177;4 min)."
+msgstr " М’який режим допускає більшу розбіжність годинника на вашому телефоні (&#177;4 хв)."
+
+#: google-authenticator.php:999
+msgid "Description"
+msgstr "Опис"
+
+#: google-authenticator.php:1000
+msgid " Description that you'll see in the Google Authenticator app on your phone."
+msgstr " Опис, який ви побачите в застосунку Google Authenticator на телефоні."
+
+#: google-authenticator.php:1004
+msgid "Secret"
+msgstr "Секретний ключ"
+
+#: google-authenticator.php:1008
+msgid "Create new secret"
+msgstr "Створити новий секретний ключ"
+
+#: google-authenticator.php:1009
+msgid "Show/Hide QR code"
+msgstr "Показати/сховати QR-код"
+
+#: google-authenticator.php:1021
+msgid "Scan this with the Google Authenticator app."
+msgstr "Відскануйте це застосунком Google Authenticator."
+
+#: google-authenticator.php:1033
+msgid "Enable App password"
+msgstr "Увімкнути пароль застосунку"
+
+#: google-authenticator.php:1035
+msgid " Enabling an App password will decrease your overall login security."
+msgstr " Увімкнення пароля застосунку знижує загальну безпеку входу."
+
+#: google-authenticator.php:1043
+msgid "Create new password"
+msgstr "Створити новий пароль"
+
+#: google-authenticator.php:1044
+msgid " Password is not stored in cleartext, this is your only chance to see it."
+msgstr " Пароль не зберігається у відкритому вигляді — це ваша єдина можливість його побачити."
+
+#: google-authenticator.php:1052
+msgid "Authenticator Code"
+msgstr "Код автентифікатора"
+
+#: google-authenticator.php:1053
+msgid "After adding the site to your authenticator app, type the code it shows here."
+msgstr "Додавши сайт у застосунок-автентифікатор, введіть тут показаний у ньому код."
+
+#: google-authenticator.php:1059
+msgid "Verify Authenticator Code"
+msgstr "Перевірити код автентифікатора"
+
+#: google-authenticator.php:1212
+msgid "Hide settings from user"
+msgstr "Сховати налаштування від користувача"

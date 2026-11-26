@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Google Authenticator 0.58\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/google-authenticator/\n"
-"POT-Creation-Date: 2026-11-26 03:09+0000\n"
+"POT-Creation-Date: 2026-11-26 12:31+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,11 +73,11 @@ msgid "If the account setup was successful, you will be logged out, and will nee
 msgstr ""
 
 #: google-authenticator.php:480
-msgid "Successfullly saved your settings for the network"
+msgid "Successfully saved your settings for the network"
 msgstr ""
 
 #: google-authenticator.php:482
-msgid "Successfullly saved your settings for the site"
+msgid "Successfully saved your settings for the site"
 msgstr ""
 
 #: google-authenticator.php:487
