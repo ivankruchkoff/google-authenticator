@@ -878,6 +878,26 @@ function is_valid_secret( $secret ) {
 }
 
 /**
+ * Whether a user's Google Authenticator settings are hidden from their profile page.
+ *
+ * @param int $user_id User ID.
+ * @return bool
+ */
+function settings_hidden_from_user( $user_id ) {
+	$hidden = 'enabled' === trim( (string) get_user_option( 'googleauthenticator_hidefromuser', $user_id ) );
+
+	/**
+	 * Filters whether a user's Google Authenticator settings are hidden from their profile page (#18).
+	 *
+	 * Lets a site hide the settings for whole roles, or for everyone, instead of user by user.
+	 *
+	 * @param bool $hidden  Whether "Hide settings from user" is ticked for this user.
+	 * @param int  $user_id User ID.
+	 */
+	return (bool) apply_filters( 'google_authenticator_hide_settings', $hidden, $user_id );
+}
+
+/**
  * Whether a stored app password value looks like a wp_hash_password() hash.
  *
  * Rejects empty values and the legacy unsalted sha1 (40 chars) / md5 (32 chars) formats.
@@ -972,9 +992,11 @@ function profile_personal_options( $args = array() ) {
 	$user = wp_get_current_user();
 	$user_id = $user->ID;
 
-	// If editing of Google Authenticator settings has been disabled, just return
-	$GA_hidefromuser = trim( get_user_option( 'googleauthenticator_hidefromuser', $user_id ) );
-	if ( $GA_hidefromuser == 'enabled') return;
+	// If editing of Google Authenticator settings has been disabled, just return. The mandatory setup page
+	// (which shows the code field) is always shown, otherwise the user could never enroll.
+	if ( ! $args['show_authenticator_code'] && $this->settings_hidden_from_user( $user_id ) ) {
+		return;
+	}
 	
 	$GA_secret			= trim( get_user_option( 'googleauthenticator_secret', $user_id ) );
 	$GA_enabled			= trim( get_user_option( 'googleauthenticator_enabled', $user_id ) );
@@ -1002,6 +1024,17 @@ function profile_personal_options( $args = array() ) {
 		} else {
 			$GA_description = sanitize_text_field( get_bloginfo( 'name' ) );
 		}
+
+		/**
+		 * Filters the description suggested for a user's entry in their authenticator app (#18).
+		 *
+		 * The app shows it next to the codes. Someone with several accounts on the same site can tell
+		 * them apart if it includes the username, for example.
+		 *
+		 * @param string  $GA_description Default description: the site (or network) name.
+		 * @param WP_User $user           User setting up Google Authenticator.
+		 */
+		$GA_description = sanitize_text_field( (string) apply_filters( 'google_authenticator_default_description', $GA_description, $user ) );
 	}
 	
 	echo "<h3>" . esc_html__( 'Google Authenticator Settings', 'google-authenticator' ) . "</h3>\n";
@@ -1196,8 +1229,9 @@ function personal_options_update( $user_id = 0 ) {
 	// phpcs:disable WordPress.Security.NonceVerification.Missing -- WordPress checks the update-user nonce (user-edit.php) before this action fires.
 
 	// If editing of Google Authenticator settings has been disabled, just return
-	$GA_hidefromuser = trim( get_user_option( 'googleauthenticator_hidefromuser', $user_id ) );
-	if ( $GA_hidefromuser == 'enabled') return;
+	if ( $this->settings_hidden_from_user( $user_id ) ) {
+		return;
+	}
 
 
 	$GA_enabled	= ! empty( $_POST['GA_enabled'] );

@@ -93,6 +93,8 @@ Yes. Each user has their own secret and settings.
 * `google_authenticator_lockout_duration` (filter): length of a block in seconds. Default 60, doubling up to 3600.
 * `google_authenticator_failed_code` (action): fires when a wrong code is sent with the correct password.
 * `google_authenticator_code_reused` (action): fires when a code that was already used is sent again.
+* `google_authenticator_default_description` (filter): the description suggested for a user's entry in their authenticator app. Default: the site name. For example, to tell several accounts on the same site apart: `add_filter( 'google_authenticator_default_description', function ( $description, $user ) { return $description . ' (' . $user->user_login . ')'; }, 10, 2 );`
+* `google_authenticator_hide_settings` (filter): whether to hide the Google Authenticator settings from a user's profile page. Receives the user's "Hide settings from user" setting and the user ID, so you can hide them for whole roles or for everyone. The mandatory setup page is always shown.
 
 Wrong codes also fire WordPress's standard `wp_login_failed` action, so login-limiting plugins see them.
 
@@ -128,6 +130,7 @@ Yes. The replay protection isn't compatible with the test/setup mode of the "Sto
 * Login form: a wrong code shakes the form, like a wrong password does.
 * Codes typed with full-width digits (for example with a Japanese input method) are now accepted in every browser.
 * Turning on Google Authenticator from the profile page, or saving a new secret while it is on, now needs a code from your authenticator app, so a mistake when adding the site to the app can no longer lock you out. Administrators can still turn it on for other users without a code.
+* New filters `google_authenticator_default_description` and `google_authenticator_hide_settings`, and "Hide settings from user" no longer hides the mandatory setup page.
 * Codes copied from an authenticator app are now accepted with any separator between the digits, such as "012 345", "012-345" or the no-break and thin spaces some apps and phones insert. Previously any space made a valid code fail.
 * Fixed the QR code for descriptions or site names with non-English characters. They were encoded incorrectly, so authenticator apps could show a garbled name or reject the code.
 * Fixed the setup page not sending users who already have two-factor authentication enabled back to the dashboard.
