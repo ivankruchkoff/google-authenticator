@@ -23,7 +23,7 @@ It works with Google Authenticator and any other app that supports time-based on
 **Features**
 
 * **Per-user two-factor authentication.** Each user turns it on from their profile and scans a QR code with their app.
-* **Mandatory 2FA by role.** Administrators can require it for chosen roles, such as Administrator and Editor. Users with any of those roles are sent to a setup page until they have enrolled. On multisite this can be set per site or for the whole network.
+* **Mandatory 2FA by role.** Administrators can require it for chosen roles, such as Administrator and Editor. Users with any of those roles are sent to a setup page until they have enrolled. On multisite this can be set per site or for the whole network, and the network settings can also require it for all Super Admins.
 * **Brute-force protection.** After 5 wrong codes sent with the correct password, further attempts are blocked for 1 minute, doubling with each further wrong code up to 1 hour.
 * **Replay protection.** Each code can only be used once.
 * **Two-screen sign-in (optional).** Ask for the code on a second screen after the username and password.
@@ -131,6 +131,7 @@ Yes. The replay protection isn't compatible with the test/setup mode of the "Sto
 * Codes typed with full-width digits (for example with a Japanese input method) are now accepted in every browser.
 * Turning on Google Authenticator from the profile page, or saving a new secret while it is on, now needs a code from your authenticator app, so a mistake when adding the site to the app can no longer lock you out. Administrators can still turn it on for other users without a code.
 * New filters `google_authenticator_default_description` and `google_authenticator_hide_settings`, and "Hide settings from user" no longer hides the mandatory setup page.
+* On multisite, the network settings can now require 2FA for all Super Admins, including those with no role on a site.
 * Codes copied from an authenticator app are now accepted with any separator between the digits, such as "012 345", "012-345" or the no-break and thin spaces some apps and phones insert. Previously any space made a valid code fail.
 * Fixed the QR code for descriptions or site names with non-English characters. They were encoded incorrectly, so authenticator apps could show a garbled name or reject the code.
 * Fixed the setup page not sending users who already have two-factor authentication enabled back to the dashboard.

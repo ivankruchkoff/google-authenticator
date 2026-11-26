@@ -63,6 +63,8 @@ class GoogleAuthenticator {
 
 static $instance; // to store a reference to the plugin, allows other plugins to remove actions
 const SETUP_PAGE = 'google_authenticator_user_page';
+// Stored with the mandatory roles on the network settings page to require 2FA for Super Admins (#10).
+const SUPER_ADMINS = '__super_admins__';
 protected $error_message = null;
 protected $setup_secret = null; // Secret posted (with a valid nonce) to the setup page, re-shown after a wrong code.
 protected $profile_error = null; // Set when a profile change was refused because the verification code was missing or wrong.
@@ -245,6 +247,10 @@ function user_needs_to_setup_google_authenticator() {
 	if ( is_multisite() ) {
 		$roles = (array) get_site_option( 'googleauthenticator_mandatory_mfa_roles', array() );
 		if ( array_intersect( $user_roles, $roles ) ) {
+			$must_signup = true;
+		}
+		// Super Admins, whatever their role on this site (#10).
+		if ( in_array( self::SUPER_ADMINS, $roles, true ) && is_super_admin( $user->ID ) ) {
 			$must_signup = true;
 		}
 		$check_single_site_admin_options = ! get_site_option( 'googleauthenticator_network_only' );
@@ -508,6 +514,10 @@ function common_admin_setup_page( $is_network = false ) {
 			<?php foreach ($roles as $role_key => $role) {
 				$this->show_role_checkbox( $role_key, $role, $is_network );
 			}
+			// Super Admins aren't a role (and may have no role on a site), so they get their own checkbox (#10).
+			if ( $is_network ) {
+				$this->show_role_checkbox( self::SUPER_ADMINS, array( 'label' => __( 'Super Admins', 'google-authenticator' ) ), $is_network );
+			}
 			if ( $edit_enabled ) {
 				wp_nonce_field( 'googleauthenticator', 'googleauthenticator' );
 				submit_button();
@@ -562,7 +572,7 @@ function show_role_checkbox( $role_key, $role, $is_network ) {
 	}
 
 	?>
-	<p><label><input name="roles[]" type="checkbox"<?php if ( $readonly ) { echo ' readonly="readonly"'; } checked( $checked, true ); ?> value="<?php echo esc_attr( $role_key ); ?>"><strong><?php echo esc_html( translate_user_role( $role[ 'name' ] ) ); ?></strong></label> <?php echo wp_kses( $readonly_label, array( 'a' => array( 'href' => array() ) ) ); ?></p>
+	<p><label><input name="roles[]" type="checkbox"<?php if ( $readonly ) { echo ' readonly="readonly"'; } checked( $checked, true ); ?> value="<?php echo esc_attr( $role_key ); ?>"><strong><?php echo esc_html( isset( $role['label'] ) ? $role['label'] : translate_user_role( $role['name'] ) ); ?></strong></label> <?php echo wp_kses( $readonly_label, array( 'a' => array( 'href' => array() ) ) ); ?></p>
 	<?php
 }
 
