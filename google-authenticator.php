@@ -2,11 +2,14 @@
 /*
 Plugin Name: Google Authenticator
 Plugin URI: https://github.com/ivankruchkoff/google-authenticator
-Description: Two-Factor Authentication for WordPress using the Android/iPhone/Blackberry app as One Time Password generator.
+Description: Two-factor authentication for WordPress using Google Authenticator or any other time-based (TOTP) authenticator app.
 Author: Ivan Kruchkoff
 Version: 0.58
 Author URI: https://github.com/ivankruchkoff
-Compatibility: WordPress 5.6
+Requires at least: 4.5
+Requires PHP: 7.2
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: google-authenticator
 Domain Path: /lang
 
@@ -453,7 +456,8 @@ function save_submitted_admin_setup_page( $is_network ) {
  */
 function common_admin_setup_page( $is_network = false ) {
 	if ( $is_network ) {
-		$site_ids = get_sites( 'fields=ids' );
+		// get_sites() was added in WordPress 4.6; fall back to wp_get_sites() on 4.5.
+		$site_ids = function_exists( 'get_sites' ) ? get_sites( 'fields=ids' ) : wp_list_pluck( wp_get_sites(), 'blog_id' );
 		$roles = get_editable_roles();
 		foreach( $site_ids as $site_id ) {
 			switch_to_blog( $site_id );
