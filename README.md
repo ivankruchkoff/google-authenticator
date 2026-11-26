@@ -120,6 +120,12 @@ Yes. The replay protection isn't compatible with the test/setup mode of the "Sto
 * Fixed two screen sign-in for passwords containing quotes or backslashes.
 * Fixed site settings on multisite being editable only when network-wide settings were enforced (the reverse of what was intended).
 * Fixed the network settings page on WordPress 4.5.
+* Login form: the code field now lines up with the username and password fields in every browser. It uses the same markup as WordPress's own fields; it was slightly narrower in some browsers, such as Safari.
+* Login form: the "leave this field empty" hint is now a help button next to the label (WordPress 7.1 and later), so it can be read on phones and by screen readers.
+* Login form: Safari and password managers can fill in the code automatically, and phones show a number keypad.
+* Login form: the cursor now starts in the username field, as on a normal WordPress login, instead of jumping to the code field. On the two-screen sign-in page it still starts in the code field.
+* Login form: a wrong code shakes the form, like a wrong password does.
+* Codes typed with full-width digits (for example with a Japanese input method) are now accepted in every browser.
 * Tested with WordPress 7.2 and PHP 7.2 to 8.6.
 * Updated readme and FAQ.
 

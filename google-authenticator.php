@@ -85,10 +85,11 @@ function init() {
 
     if ( ! $this->is_two_screen_signin_enabled() ) {
 	    add_action( 'login_form', array( $this, 'loginform' ) );
-	    add_action( 'login_footer', array( $this, 'loginfooter' ) );
+	    add_action( 'login_enqueue_scripts', array( $this, 'login_styles' ) );
     }
 
     add_filter( 'authenticate', array( $this, 'check_otp' ), 50, 3 );
+    add_filter( 'shake_error_codes', array( $this, 'shake_error_codes' ) );
 
     if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
         add_action( 'wp_ajax_GoogleAuthenticator_action', array( $this, 'ajax_callback' ) );
@@ -579,25 +580,49 @@ function network_admin_setup_page() {
 /**
  * Add verification code field to login form.
  */
-function loginform() {
-    echo "\t<p>\n";
-    echo "\t\t<label title=\"" . esc_attr__( 'If you don\'t have Google Authenticator enabled for your WordPress account, leave this field empty.', 'google-authenticator' ) . "\">" . esc_html__( 'Google Authenticator code', 'google-authenticator' ) . "<span id=\"google-auth-info\"></span><br />\n";
-    echo "\t\t<input type=\"text\" name=\"googleotp\" id=\"googleotp\" class=\"input\" value=\"\" size=\"20\" style=\"ime-mode: inactive;\" autocomplete=\"off\" /></label>\n";
-    echo "\t</p>\n";
-    echo "\t<script type=\"text/javascript\">\n";
-    echo "\t\tdocument.getElementById(\"googleotp\").focus();\n";
-    echo "\t</script>\n";
+function loginform( $secondary_screen = false ) {
+	// Same markup as WordPress core's own login fields (label, then input, inside a <p>). The input used
+	// to sit inside the label; core styles labels as inline-block, so its width:100% was resolved against
+	// the label's shrink-to-fit width, which every browser computes differently.
+	$help = __( 'If you don\'t have Google Authenticator enabled for your WordPress account, leave this field empty.', 'google-authenticator' );
+	// The hint only applies to the normal login form; the second screen is only shown to 2FA users.
+	$toggletip = ( ! $secondary_screen && function_exists( 'wp_get_toggletip' ) )
+		? wp_get_toggletip( $help, array( 'id' => 'googleotp-help-toggletip' ) )
+		: '';
+	?>
+	<p class="googleotp-wrap">
+		<?php if ( '' !== $toggletip ) : ?>
+			<span class="googleotp-label-row">
+				<label for="googleotp"><?php esc_html_e( 'Google Authenticator code', 'google-authenticator' ); ?></label>
+				<?php echo $toggletip; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built and escaped by wp_get_toggletip(). ?>
+			</span>
+		<?php else : ?>
+			<label for="googleotp"<?php if ( ! $secondary_screen ) { echo ' title="' . esc_attr( $help ) . '"'; } ?>><?php esc_html_e( 'Google Authenticator code', 'google-authenticator' ); ?></label>
+		<?php endif; ?>
+		<input type="text" name="googleotp" id="googleotp" class="input" value="" size="20" autocomplete="one-time-code" inputmode="numeric" autocapitalize="off" spellcheck="false"<?php if ( $secondary_screen ) { echo ' autofocus="autofocus"'; } ?> />
+	</p>
+	<?php
 }
 
 /**
- * Disable autocomplete on Google Authenticator code input field.
+ * Shake the login form for a wrong or missing code, like core does for a wrong password.
+ *
+ * @param string[] $codes Error codes that shake the login form.
+ * @return string[]
  */
-function loginfooter() {
-    echo "\n<script type=\"text/javascript\">\n";
-    echo "\ttry{\n";
-    echo "\t\tdocument.getElementById('user_email').setAttribute('autocomplete','off');\n";
-    echo "\t} catch(e){}\n";
-    echo "</script>\n";
+function shake_error_codes( $codes ) {
+	$codes[] = 'invalid_google_authenticator_token';
+	$codes[] = 'google_authenticator_too_many_attempts';
+	return $codes;
+}
+
+/**
+ * Align the help toggle with the field label, the same way core aligns the "Remember Me" help toggle.
+ */
+function login_styles() {
+	if ( function_exists( 'wp_get_toggletip' ) ) {
+		wp_add_inline_style( 'login', '.login .googleotp-label-row{display:flex;align-items:center;gap:4px;margin-bottom:3px}.login .googleotp-label-row label{margin:0}' );
+	}
 }
 
 /**
@@ -730,7 +755,10 @@ function get_submitted_otp() {
 		return '';
 	}
 	// phpcs:ignore WordPress.Security.NonceVerification.Missing
-	return preg_replace( '/\s+/', '', sanitize_text_field( wp_unslash( $_POST['googleotp'] ) ) );
+	$otp = sanitize_text_field( wp_unslash( $_POST['googleotp'] ) );
+	// Accept full-width digits and spaces, as typed with a Japanese / Chinese / Korean input method.
+	$otp = strtr( $otp, array( '０' => '0', '１' => '1', '２' => '2', '３' => '3', '４' => '4', '５' => '5', '６' => '6', '７' => '7', '８' => '8', '９' => '9', '　' => ' ' ) );
+	return preg_replace( '/\s+/', '', $otp );
 }
 
 /**
@@ -878,7 +906,7 @@ function secondary_login_screen() {
 		<?php if ( $rememberme ): ?>
 				<input name="rememberme" type="hidden" id="rememberme" value="forever" />
 		<?php endif; ?>
-		<?php $this->loginform(); ?>
+		<?php $this->loginform( true ); ?>
 		<p><?php esc_html_e( 'Please enter the Google Authenticator code using the app on your device.', 'google-authenticator' ); ?></p>
 		<p class="submit">
 			<input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large" value="<?php esc_attr_e('Log In'); ?>" />
