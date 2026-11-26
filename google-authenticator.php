@@ -35,7 +35,6 @@ Thanks to Ian Dunn for fixing some depricated function calls.
 Thanks to Kimmo Suominen for fixing the iPhone description issue.
 Thanks to Alex Concha for some security tips.
 Thanks to Sébastien Prunier for his Spanish and French translations.
-Thanks to Miguel Mendez Z for responsibly disclosing and reporting a CSRF account lockout vulnerability.
 
 ----------------------------------------------------------------------------
 
@@ -170,7 +169,14 @@ function verify( $secretkey, $thistry, $relaxedmode, $lasttimeslot ) {
 			// meaning current login attempt has to be in the future compared to
 			// last successful login.
 			if ( $lasttimeslot >= ($tm+$i) ) {
-				error_log("Google Authenticator plugin: Man-in-the-middle attack detected (Could also be 2 legit login attempts within the same 30 second period)");
+				/**
+				 * Fires when an already used verification code is sent again (a possible replay attack,
+				 * or two logins within the same 30 seconds).
+				 */
+				do_action( 'google_authenticator_code_reused' );
+				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+					error_log( 'Google Authenticator plugin: Man-in-the-middle attack detected (Could also be 2 legit login attempts within the same 30 second period)' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Only with WP_DEBUG on.
+				}
 				return false;
 			}
 			// Return timeslot in which login happened.
@@ -266,7 +272,7 @@ function redirect_if_setup_required() {
 
 		// Some check against super admin so they can enable/disable the plugin.
 		$location = admin_url( 'admin.php?page=' . self::SETUP_PAGE );
-		wp_redirect( $location);
+		wp_safe_redirect( $location );
 		exit;
 	}
 }
@@ -277,6 +283,12 @@ function redirect_if_setup_required() {
  */
 function save_submitted_setup_page() {
 	$this->error_message = null; // Reset a previous error message if it was set
+
+	// Users who already have Google Authenticator enabled don't need this page.
+	if ( 'enabled' === trim( (string) get_user_option( 'googleauthenticator_enabled', get_current_user_id() ) ) ) {
+		wp_safe_redirect( admin_url( 'index.php' ) );
+		exit;
+	}
 
 	if ( 'POST' !== strtoupper( isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '' ) ) {
 		return;
@@ -308,7 +320,7 @@ function save_submitted_setup_page() {
 		update_user_option( $user->ID, 'googleauthenticator_secret', $secret, true );
 		update_user_option( $user->ID, 'googleauthenticator_enabled', 'enabled', true );
 		$location = admin_url( 'index.php?googleauthenticator=enabled' );
-		wp_redirect( $location );
+		wp_safe_redirect( $location );
 		exit;
 	};
 
@@ -319,7 +331,7 @@ function save_submitted_setup_page() {
  * Show the user a success message after we redirect them following successful google authenticator setup
  */
 function successful_signup_message() {
-	if ( ! empty( $_GET['googleauthenticator'] ) && 'enabled' === $_GET['googleauthenticator'] ) : ?>
+	if ( isset( $_GET['googleauthenticator'] ) && 'enabled' === $_GET['googleauthenticator'] ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only chooses whether to show a notice. ?>
 		<div class="updated notice">
 			<p><?php esc_html_e( 'Congratulations, you have successfully enabled Google Authenticator for your account', 'google-authenticator' ); ?></p>
 		</div>
@@ -331,45 +343,34 @@ function successful_signup_message() {
  * Callback function to render the google authenticator setup page
  */
 function user_setup_page() {
-	$user = wp_get_current_user();
-	$enabled = trim(get_user_option( 'googleauthenticator_enabled', $user->ID ) ) === 'enabled';
-	if ( $enabled ) {
-		$location = admin_url( 'index.php' );
-		wp_redirect( $location );
-		exit;
-	}
 	$error = $this->error_message;
 
+	// Current authenticator apps. (Authy's desktop app and Chrome extension, and Windows Phone, are discontinued.)
 	$app_links = array(
 		array(
-			'text' => __( 'iOS: Authy', 'google-authenticator' ),
-			'link' => 'https://itunes.apple.com/app/authy/id494168017',
-		),
-		array(
 			'text' => __( 'iOS: Google Authenticator', 'google-authenticator' ),
-			'link' => 'https://itunes.apple.com/app/google-authenticator/id388497605',
-		),
-		array(
-			'text' => __( 'Android: Authy', 'google-authenticator' ),
-			'link' => 'https://play.google.com/store/apps/details?id=com.authy.authy',
+			'link' => 'https://apps.apple.com/app/google-authenticator/id388497605',
 		),
 		array(
 			'text' => __( 'Android: Google Authenticator', 'google-authenticator' ),
 			'link' => 'https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2',
 		),
 		array(
-			'text' => __( 'Windows Phone', 'google-authenticator' ),
-			'link' => 'https://www.microsoft.com/store/p/authenticator/9nblggh08h54',
+			'text' => __( 'iOS: Microsoft Authenticator', 'google-authenticator' ),
+			'link' => 'https://apps.apple.com/app/microsoft-authenticator/id983156458',
 		),
 		array(
-			'text' => __( 'Chrome Browser', 'google-authenticator' ),
-			'link' => 'https://chrome.google.com/webstore/detail/authy-chrome-extension/fhgenkpocbhhddlgkjnfghpjanffonno',
+			'text' => __( 'Android: Microsoft Authenticator', 'google-authenticator' ),
+			'link' => 'https://play.google.com/store/apps/details?id=com.azure.authenticator',
 		),
 		array(
-			'text' => __( 'Desktop', 'google-authenticator' ),
-			'link' => 'https://authy.com/download/',
+			'text' => __( 'iOS: Authy', 'google-authenticator' ),
+			'link' => 'https://apps.apple.com/app/twilio-authy/id494168017',
 		),
-
+		array(
+			'text' => __( 'Android: Authy', 'google-authenticator' ),
+			'link' => 'https://play.google.com/store/apps/details?id=com.authy.authy',
+		),
 	);
 
 	?>
@@ -378,7 +379,7 @@ function user_setup_page() {
 		<?php if (is_wp_error( $error ) ): ?>
 			<div class="error notice"><p><?php echo esc_html( $error->get_error_message() ); ?></p></div>
 		<?php endif; ?>
-		<p><?php echo esc_html__( "If you haven't already done so, please install the Authy or Google Authenticator app on your mobile device from the App Store:", 'google-authenticator' ); ?></p>
+		<p><?php echo esc_html__( "If you haven't already done so, please install an authenticator app on your mobile device, for example:", 'google-authenticator' ); ?></p>
 		<ul>
 			<?php foreach( $app_links as $app_link ): ?>
 				<li><a href="<?php echo esc_url( $app_link[ 'link' ] ); ?>"><?php echo esc_html( $app_link[ 'text' ] ); ?></a></li>
@@ -392,7 +393,6 @@ function user_setup_page() {
 			<?php echo esc_html__( 'If the account setup was successful, you will be logged out, and will need to login again using your Username, Password and Authenticator code generated using the App on your mobile device.', 'google-authenticator' ); ?>
 		</p>
 		<form method="post">
-		<?php wp_nonce_field( 'googleauthenticator_setup', 'googleauthenticator_setup_nonce' ); ?>
 		<?php wp_nonce_field( 'googleauthenticator_setup', 'googleauthenticator_setup_nonce' ); ?>
 		<?php $this->profile_personal_options( array(
 			'show_active' => false,
@@ -413,8 +413,8 @@ function user_setup_page() {
  * @param $is_network
  */
 function save_submitted_admin_setup_page( $is_network ) {
-	$nonce = isset( $_POST['googleauthenticator'] )
-		? sanitize_text_field( wp_unslash( $_POST['googleauthenticator'] ) )
+	$nonce = isset( $_POST['googleauthenticator'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- This is the nonce, verified below.
+		? sanitize_text_field( wp_unslash( $_POST['googleauthenticator'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		: '';
 	if ( wp_verify_nonce( $nonce, 'googleauthenticator' ) ) {
 		if ( $is_network ) {
@@ -423,7 +423,7 @@ function save_submitted_admin_setup_page( $is_network ) {
 				update_site_option( 'googleauthenticator_network_only', $network_settings_only );
 			}
 		}
-		$two_screen_mfa = isset( $_POST['two_screen_approach'] ) && 'true' === $_POST['two_screen_approach'];
+		$two_screen_mfa = isset( $_POST['two_screen_approach'] ) && 'true' === sanitize_key( wp_unslash( $_POST['two_screen_approach'] ) );
 		if ( is_multisite() && $is_network ) {
 			if ( current_user_can( 'manage_network_options' ) ) {
 				update_site_option( 'googleauthenticator_two_screen_signin', $two_screen_mfa );
@@ -554,6 +554,7 @@ function show_role_checkbox( $role_key, $role, $is_network ) {
 		if ( current_user_can( 'manage_network' ) ) {
 			$readonly_label = __( "Sorry, you can't disable checks for this role as it's enabled at the network level.", 'google-authenticator' );
 		} else {
+			/* translators: %s: URL of the network settings page */
 			$readonly_label = sprintf( __( 'Sorry, this role is enabled at the network level and can only be disabled via the <a href="%s">network settings</a>', 'google-authenticator' ), esc_url( network_admin_url( 'settings.php?page=google_authenticator' ) ) );
 		}
 	}
@@ -656,8 +657,8 @@ function check_otp( $user, $username = '', $password = '' ) {
 
 	$otp = $this->get_submitted_otp();
 
-	// XML-RPC / APP login with an App password (only when no verification code was sent).
-	$is_api_request = defined( 'XMLRPC_REQUEST' ) || defined( 'APP_REQUEST' );
+	// XML-RPC login with an App password (only when no verification code was sent).
+	$is_api_request = defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST;
 	if ( '' === $otp && $is_api_request && 'enabled' === trim( (string) get_user_option( 'googleauthenticator_pwdenabled', $user->ID ) ) ) {
 		return $this->check_app_password( $user, $password );
 	}
@@ -703,7 +704,7 @@ function check_otp( $user, $username = '', $password = '' ) {
 }
 
 /**
- * Check an App password (XML-RPC / APP logins). The App password replaces both the
+ * Check an App password (XML-RPC logins). The App password replaces both the
  * WordPress password and the verification code for these requests.
  *
  * @param WP_User $user     User being logged in.
@@ -728,7 +729,7 @@ function check_app_password( $user, $password ) {
 	if ( wp_check_password( $userpassword, $passwordhash ) ) {
 		return new WP_User( $user->ID );
 	}
-	// Wrong XMLRPC/APP password !
+	// Wrong XML-RPC App password.
 	return $error;
 }
 
@@ -909,7 +910,7 @@ function secondary_login_screen() {
 		<?php $this->loginform( true ); ?>
 		<p><?php esc_html_e( 'Please enter the Google Authenticator code using the app on your device.', 'google-authenticator' ); ?></p>
 		<p class="submit">
-			<input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large" value="<?php esc_attr_e('Log In'); ?>" />
+			<input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large" value="<?php esc_attr_e( 'Log In', 'google-authenticator' ); ?>" />
 			<input type="hidden" name="redirect_to" value="<?php echo esc_url( $redirect_to ); ?>" />
 			<input type="hidden" name="testcookie" value="1" />
 		</p>
@@ -1022,7 +1023,7 @@ function profile_personal_options( $args = array() ) {
 	echo "</tr>\n";
 	if ( $args['show_secret_qr']) : ?>
 		<script>
-		var qrcode="otpauth://totp/WordPress:"+escape(jQuery('#GA_description').val())+"?secret="+jQuery('#GA_secret').val()+"&issuer=WordPress";
+		var qrcode="otpauth://totp/WordPress:"+encodeURIComponent(jQuery('#GA_description').val())+"?secret="+jQuery('#GA_secret').val()+"&issuer=WordPress";
 		jQuery('#GA_QRCODE').qrcode(qrcode);
 		</script>
 	<?php endif;
@@ -1049,7 +1050,7 @@ function profile_personal_options( $args = array() ) {
 	if ( $args['show_authenticator_code']) {
 		echo "<tr>\n";
 		echo "<th><label for=\"GA_otp_code\">" . esc_html__( 'Authenticator Code', 'google-authenticator' ) . "</label></th>\n";
-		echo "<td><input name=\"GA_otp_code\" id=\"GA_otp_code\" type=\"text\" size=\"25\" /><span class=\"description\">" . esc_html__( 'After adding the site to your google authy account, add your authenticator code here.', 'google-authenticator' ) . "</span><br /></td>\n";
+		echo "<td><input name=\"GA_otp_code\" id=\"GA_otp_code\" type=\"text\" size=\"25\" /><span class=\"description\">" . esc_html__( 'After adding the site to your authenticator app, type the code it shows here.', 'google-authenticator' ) . "</span><br /></td>\n";
 		echo "</tr>\n";
 	}
 
@@ -1062,7 +1063,7 @@ function profile_personal_options( $args = array() ) {
 
   	echo <<<ENDOFJS
   	//Create new secret and display it
-	jQuery('#GA_newsecret').bind('click', function() {
+	jQuery('#GA_newsecret').on('click', function() {
 		// Remove existing QRCode
 		jQuery('#GA_QRCODE').html("");
 		var data=new Object();
@@ -1070,14 +1071,14 @@ function profile_personal_options( $args = array() ) {
 		data['nonce']	= GAnonce;
 		jQuery.post(ajaxurl, data, function(response) {
   			jQuery('#GA_secret').val(response['new-secret']);
-  			var qrcode="otpauth://totp/WordPress:"+escape(jQuery('#GA_description').val())+"?secret="+jQuery('#GA_secret').val()+"&issuer=WordPress";
+		var qrcode="otpauth://totp/WordPress:"+encodeURIComponent(jQuery('#GA_description').val())+"?secret="+jQuery('#GA_secret').val()+"&issuer=WordPress";
 			jQuery('#GA_QRCODE').qrcode(qrcode);
  			jQuery('#GA_QR_INFO').show('slow');
   		});  	
 	});
 
 	// If the user starts modifying the description, hide the qrcode
-	jQuery('#GA_description').bind('focus blur change keyup', function() {
+	jQuery('#GA_description').on('focus blur change keyup', function() {
 		// Only remove QR Code if it's visible
 		if (jQuery('#GA_QR_INFO').is(':visible')) {
 			jQuery('#GA_QR_INFO').hide('slow');
@@ -1086,18 +1087,18 @@ function profile_personal_options( $args = array() ) {
 	});
 
 	// Create new app password
-	jQuery('#GA_createpassword').bind('click',function() {
+	jQuery('#GA_createpassword').on('click',function() {
 		var data=new Object();
 		data['action']	= 'GoogleAuthenticator_action';
 		data['nonce']	= GAnonce;
 		data['save']	= 1;
 		jQuery.post(ajaxurl, data, function(response) {
-  			jQuery('#GA_password').val(response['new-secret'].match(new RegExp(".{0,4}","g")).join(' '));
+		jQuery('#GA_password').val(response['new-secret'].match(/.{1,4}/g).join(' '));
   			jQuery('#GA_passworddesc').show();
   		});  	
 	});
 	
-	jQuery('#GA_enabled').bind('change',function() {
+	jQuery('#GA_enabled').on('change',function() {
 		GoogleAuthenticator_apppasswordcontrol();
 	});
 
@@ -1108,18 +1109,18 @@ function profile_personal_options( $args = array() ) {
 	
 	function GoogleAuthenticator_apppasswordcontrol() {
 		if (jQuery('#GA_enabled').is(':checked')) {
-			jQuery('#GA_pwdenabled').removeAttr('disabled');
-			jQuery('#GA_createpassword').removeAttr('disabled');
+			jQuery('#GA_pwdenabled').prop('disabled', false);
+			jQuery('#GA_createpassword').prop('disabled', false);
 		} else {
-			jQuery('#GA_pwdenabled').removeAttr('checked')
-			jQuery('#GA_pwdenabled').attr('disabled', true);
-			jQuery('#GA_createpassword').attr('disabled', true);
+			jQuery('#GA_pwdenabled').prop('checked', false);
+			jQuery('#GA_pwdenabled').prop('disabled', true);
+			jQuery('#GA_createpassword').prop('disabled', true);
 		}
 	}
 
 	function ShowOrHideQRCode() {
 		if (jQuery('#GA_QR_INFO').is(':hidden')) {
-			var qrcode="otpauth://totp/WordPress:"+escape(jQuery('#GA_description').val())+"?secret="+jQuery('#GA_secret').val()+"&issuer=WordPress";
+			var qrcode="otpauth://totp/WordPress:"+encodeURIComponent(jQuery('#GA_description').val())+"?secret="+jQuery('#GA_secret').val()+"&issuer=WordPress";
 			jQuery('#GA_QRCODE').qrcode(qrcode);
 	        jQuery('#GA_QR_INFO').show('slow');
 		} else {
@@ -1134,8 +1135,13 @@ ENDOFJS;
 /**
  * Form handling of Google Authenticator options added to personal profile page (user editing his own profile)
  */
-function personal_options_update() {
-	global $user_id;
+function personal_options_update( $user_id = 0 ) {
+	// WordPress passes the user ID; fall back to the global it sets for older callers.
+	$user_id = (int) ( $user_id ? $user_id : ( isset( $GLOBALS['user_id'] ) ? $GLOBALS['user_id'] : 0 ) );
+	if ( ! $user_id || ! current_user_can( 'edit_user', $user_id ) ) {
+		return;
+	}
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- WordPress checks the update-user nonce (user-edit.php) before this action fires.
 
 	// If editing of Google Authenticator settings has been disabled, just return
 	$GA_hidefromuser = trim( get_user_option( 'googleauthenticator_hidefromuser', $user_id ) );
@@ -1179,7 +1185,7 @@ function personal_options_update() {
 	if ( 'XXXXXXXXXXXXXXXX' !== $GA_password && preg_match( '/^[A-Z2-7]{16}$/', $GA_password ) ) {
 		// Store the password in a format that can be expanded easily later on if needed.
 		$GA_password = array( 'appname' => 'Default', 'password' => wp_hash_password( $GA_password ) );
-		update_user_option( $user_id, 'googleauthenticator_passwords', json_encode( $GA_password ), true );
+		update_user_option( $user_id, 'googleauthenticator_passwords', wp_json_encode( $GA_password ), true );
 	}
 	
 	update_user_option( $user_id, 'googleauthenticator_enabled', $GA_enabled, true );
@@ -1187,15 +1193,15 @@ function personal_options_update() {
 	update_user_option( $user_id, 'googleauthenticator_relaxedmode', $GA_relaxedmode, true );
 	update_user_option( $user_id, 'googleauthenticator_secret', $GA_secret, true );
 	update_user_option( $user_id, 'googleauthenticator_pwdenabled', $GA_pwdenabled, true );
-
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
 }
 
 /**
  * Extend profile page with ability to enable/disable Google Authenticator authentication requirement.
  * Used by an administrator when editing other users.
  */
-function edit_user_profile() {
-	global $user_id;
+function edit_user_profile( $profile_user = null ) {
+	$user_id = $profile_user instanceof WP_User ? $profile_user->ID : ( isset( $GLOBALS['user_id'] ) ? (int) $GLOBALS['user_id'] : 0 );
 	$GA_enabled      = trim( get_user_option( 'googleauthenticator_enabled', $user_id ) );
 	$GA_hidefromuser = trim( get_user_option( 'googleauthenticator_hidefromuser', $user_id ) );
 	echo "<h3>" . esc_html__( 'Google Authenticator Settings', 'google-authenticator' ) . "</h3>\n";
@@ -1223,11 +1229,16 @@ function edit_user_profile() {
 /**
  * Form handling of Google Authenticator options on edit profile page (admin user editing other user)
  */
-function edit_user_profile_update() {
-	global $user_id;
-	
+function edit_user_profile_update( $user_id = 0 ) {
+	$user_id = (int) ( $user_id ? $user_id : ( isset( $GLOBALS['user_id'] ) ? $GLOBALS['user_id'] : 0 ) );
+	if ( ! $user_id || ! current_user_can( 'edit_user', $user_id ) ) {
+		return;
+	}
+
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- WordPress checks the update-user nonce (user-edit.php) before this action fires.
 	$GA_enabled	     = ! empty( $_POST['GA_enabled'] );
 	$GA_hidefromuser = ! empty( $_POST['GA_hidefromuser'] );
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 	if ( ! $GA_enabled ) {
 		$GA_enabled = 'disabled';
@@ -1251,8 +1262,6 @@ function edit_user_profile_update() {
 * AJAX callback function used to generate new secret
 */
 function ajax_callback() {
-	global $user_id;
-
 	// Some AJAX security.
 	check_ajax_referer( 'GoogleAuthenticatoraction', 'nonce' );
 	

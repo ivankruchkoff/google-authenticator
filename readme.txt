@@ -88,6 +88,7 @@ Yes. Each user has their own secret and settings.
 * `google_authenticator_allowed_failed_codes` (filter): wrong codes allowed before attempts are blocked. Default 5.
 * `google_authenticator_lockout_duration` (filter): length of a block in seconds. Default 60, doubling up to 3600.
 * `google_authenticator_failed_code` (action): fires when a wrong code is sent with the correct password.
+* `google_authenticator_code_reused` (action): fires when a code that was already used is sent again.
 
 Wrong codes also fire WordPress's standard `wp_login_failed` action, so login-limiting plugins see them.
 
@@ -122,6 +123,13 @@ Yes. The replay protection isn't compatible with the test/setup mode of the "Sto
 * Login form: the cursor now starts in the username field, as on a normal WordPress login, instead of jumping to the code field. On the two-screen sign-in page it still starts in the code field.
 * Login form: a wrong code shakes the form, like a wrong password does.
 * Codes typed with full-width digits (for example with a Japanese input method) are now accepted in every browser.
+* Fixed the QR code for descriptions or site names with non-English characters. They were encoded incorrectly, so authenticator apps could show a garbled name or reject the code.
+* Fixed the setup page not sending users who already have two-factor authentication enabled back to the dashboard.
+* Updated the list of authenticator apps on the setup page (Google Authenticator, Microsoft Authenticator and Authy) and removed discontinued ones.
+* Removed a stray space at the end of newly generated app passwords.
+* New action `google_authenticator_code_reused`. The "Man-in-the-middle attack detected" message is now only written to the PHP error log when WP_DEBUG is on.
+* Code cleanup for the WordPress coding standards and Plugin Check: safe redirects, translator comments and text domains, current jQuery methods (no more jQuery Migrate warnings), and removal of obsolete code.
+* Updated the translation template.
 * Tested with WordPress 7.2 and PHP 7.2 to 8.6.
 * Updated readme and FAQ.
 
