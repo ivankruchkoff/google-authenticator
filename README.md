@@ -134,6 +134,8 @@ Yes. The replay protection isn't compatible with the test/setup mode of the "Sto
 * New action `google_authenticator_code_reused`. The "Man-in-the-middle attack detected" message is now only written to the PHP error log when WP_DEBUG is on.
 * Code cleanup for the WordPress coding standards and Plugin Check: safe redirects, translator comments and text domains, current jQuery methods (no more jQuery Migrate warnings), and removal of obsolete code.
 * Updated the translation template.
+* Translations: added Arabic, Chinese (Taiwan), Czech, Hungarian, Indonesian, Japanese, Korean, Persian, Portuguese (Portugal), Russian, Spanish (Mexico), Turkish, Ukrainian and Vietnamese, and completed and corrected the existing ten languages. All 24 now cover every string. The new and corrected strings are machine-assisted, so corrections from native speakers are very welcome on translate.wordpress.org.
+* Fixed the spelling of the "Successfully saved" settings messages.
 * Tested with WordPress 7.2 and PHP 7.2 to 8.6.
 * Updated readme and FAQ.
 

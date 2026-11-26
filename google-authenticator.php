@@ -477,9 +477,9 @@ function common_admin_setup_page( $is_network = false ) {
 		<h1><?php esc_html_e( 'Google Authenticator Settings', 'google-authenticator' ); ?></h1>
 		<?php if ( $is_updated ): ?>
 			<?php if ( $is_network ): ?>
-				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Successfullly saved your settings for the network', 'google-authenticator' ); ?></p></div>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Successfully saved your settings for the network', 'google-authenticator' ); ?></p></div>
 			<?php else: ?>
-				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Successfullly saved your settings for the site', 'google-authenticator' ); ?></p></div>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Successfully saved your settings for the site', 'google-authenticator' ); ?></p></div>
 			<?php endif; ?>
 		<?php endif; ?>
 		<form method="post">
