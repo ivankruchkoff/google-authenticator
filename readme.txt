@@ -35,7 +35,7 @@ Please note that turning on the App password feature lowers the security of that
 2. Install and activate the plugin.
 3. Go to **Users → Profile** and find the **Google Authenticator Settings** section.
 4. Scan the QR code with your authenticator app, or type in the secret (choose "time based"). You may also want to write the secret down and keep it somewhere safe.
-5. Tick **Active** and click **Update Profile**. Before you log out, log in once in a private browser window to check that your codes work.
+5. Tick **Active**, type the code your app shows into **Authenticator Code** and click **Update Profile**. Google Authenticator is only turned on if the code is right, so a mistake when adding the site to the app can't lock you out.
 6. Optional: go to **Settings → Google Authenticator** to require two-factor authentication for certain roles or to turn on two-screen sign-in. On multisite, network-wide settings are under **Network Admin → Settings → Google Authenticator**.
 
 == Frequently Asked Questions ==
@@ -76,7 +76,7 @@ The plugin doesn't generate backup codes. Use an authenticator app that backs up
 
 = I want to change my secret. Do I just scan the new QR code? =
 
-Delete the old entry from your authenticator app first, then scan the new QR code and click **Update Profile**. If you also change the description, the new entry will appear alongside the old one instead of replacing it.
+Click **Create new secret**, scan the new QR code, type the code your app shows for it into **Authenticator Code** and click **Update Profile**. The new secret is only saved if the code is right; after that you can delete the old entry from your app.
 
 = Does it work with multiple users? =
 
@@ -123,6 +123,7 @@ Yes. The replay protection isn't compatible with the test/setup mode of the "Sto
 * Login form: the cursor now starts in the username field, as on a normal WordPress login, instead of jumping to the code field. On the two-screen sign-in page it still starts in the code field.
 * Login form: a wrong code shakes the form, like a wrong password does.
 * Codes typed with full-width digits (for example with a Japanese input method) are now accepted in every browser.
+* Turning on Google Authenticator from the profile page, or saving a new secret while it is on, now needs a code from your authenticator app, so a mistake when adding the site to the app can no longer lock you out. Administrators can still turn it on for other users without a code.
 * Codes copied from an authenticator app are now accepted with any separator between the digits, such as "012 345", "012-345" or the no-break and thin spaces some apps and phones insert. Previously any space made a valid code fail.
 * Fixed the QR code for descriptions or site names with non-English characters. They were encoded incorrectly, so authenticator apps could show a garbled name or reject the code.
 * Fixed the setup page not sending users who already have two-factor authentication enabled back to the dashboard.

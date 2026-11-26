@@ -65,6 +65,7 @@ static $instance; // to store a reference to the plugin, allows other plugins to
 const SETUP_PAGE = 'google_authenticator_user_page';
 protected $error_message = null;
 protected $setup_secret = null; // Secret posted (with a valid nonce) to the setup page, re-shown after a wrong code.
+protected $profile_error = null; // Set when a profile change was refused because the verification code was missing or wrong.
 
 /**
  * Constructor, entry point of the plugin
@@ -95,6 +96,7 @@ function init() {
     }
 
     add_action( 'personal_options_update', array( $this, 'personal_options_update' ) );
+    add_action( 'user_profile_update_errors', array( $this, 'profile_update_errors' ), 10, 3 );
     add_action( 'profile_personal_options', array( $this, 'profile_personal_options' ) );
     add_action( 'edit_user_profile', array( $this, 'edit_user_profile' ) );
     add_action( 'edit_user_profile_update', array( $this, 'edit_user_profile_update' ) );
@@ -606,6 +608,21 @@ function loginform( $secondary_screen = false ) {
 }
 
 /**
+ * Explain on the profile page why Google Authenticator was not turned on, or the new secret not saved.
+ *
+ * @param WP_Error $errors Profile update errors.
+ * @param bool     $update Whether this is an update of an existing user.
+ * @param stdClass $user   User data.
+ */
+function profile_update_errors( $errors, $update, $user ) {
+	if ( 'not_enabled' === $this->profile_error ) {
+		$errors->add( 'google_authenticator_not_enabled', __( '<strong>ERROR</strong>: Google Authenticator was not turned on. Add the site to your authenticator app by scanning the QR code, then enter the code the app shows.', 'google-authenticator' ) );
+	} elseif ( 'secret_not_changed' === $this->profile_error ) {
+		$errors->add( 'google_authenticator_secret_not_changed', __( '<strong>ERROR</strong>: Your new Google Authenticator secret was not saved. Scan the new QR code with your authenticator app, then enter the code the app shows.', 'google-authenticator' ) );
+	}
+}
+
+/**
  * Shake the login form for a wrong or missing code, like core does for a wrong password.
  *
  * @param string[] $codes Error codes that shake the login form.
@@ -1044,6 +1061,14 @@ function profile_personal_options( $args = array() ) {
 		</script>
 	<?php endif;
 
+	if ( $args['show_active'] && ! $args['show_authenticator_code'] ) {
+		// Needed to turn Google Authenticator on, or to save a new secret while it is on (#20). The script
+		// below shows it only then; without JavaScript it is always visible while 2FA is off.
+		echo '<tr id="GA_verify_row"' . ( 'enabled' === $GA_enabled ? ' style="display:none"' : '' ) . ">\n";
+		echo "<th><label for=\"GA_otp_code\">" . esc_html__( 'Authenticator Code', 'google-authenticator' ) . "</label></th>\n";
+		echo "<td><input name=\"GA_otp_code\" id=\"GA_otp_code\" type=\"text\" size=\"25\" autocomplete=\"one-time-code\" inputmode=\"numeric\" /><span class=\"description\"> " . esc_html__( 'After adding the site to your authenticator app, type the code it shows here.', 'google-authenticator' ) . "</span></td>\n";
+		echo "</tr>\n";
+	}
 	if ( $args['show_app_password']) {
 		echo "<tr>\n";
 		echo "<th scope=\"row\">" . esc_html__( 'Enable App password', 'google-authenticator' ) . "</th>\n";
@@ -1076,10 +1101,21 @@ function profile_personal_options( $args = array() ) {
 	}
 	echo "<script type=\"text/javascript\">\n";
 	echo "var GAnonce='". esc_js( wp_create_nonce('GoogleAuthenticatoraction') )."';\n";
+	echo 'var GAwasEnabled=' . ( 'enabled' === $GA_enabled ? 'true' : 'false' ) . ";\n";
 
   	echo <<<ENDOFJS
+	// Show the code field when turning 2FA on, or when a new secret has to be confirmed.
+	var GAsecretChanged = false;
+	function GA_toggleVerifyRow() {
+		var needed = jQuery('#GA_enabled').is(':checked') && ( ! GAwasEnabled || GAsecretChanged );
+		jQuery('#GA_verify_row').toggle( needed );
+	}
+	jQuery('#GA_enabled').on('change', GA_toggleVerifyRow);
+	jQuery(GA_toggleVerifyRow);
   	//Create new secret and display it
 	jQuery('#GA_newsecret').on('click', function() {
+		GAsecretChanged = true;
+		GA_toggleVerifyRow();
 		// Remove existing QRCode
 		jQuery('#GA_QRCODE').html("");
 		var data=new Object();
@@ -1194,6 +1230,30 @@ function personal_options_update( $user_id = 0 ) {
 		$GA_pwdenabled = 'enabled';
 	}
 	
+	// Turning Google Authenticator on, or changing the secret while it is on, needs a code from the app
+	// for that secret. Otherwise a mistake when adding the site to the app locks the user out (#20).
+	// Administrators turning it on for someone else (edit_user_profile_update) are not asked for a code.
+	$was_enabled    = 'enabled' === trim( (string) get_user_option( 'googleauthenticator_enabled', $user_id ) );
+	$old_secret     = trim( (string) get_user_option( 'googleauthenticator_secret', $user_id ) );
+	$turning_on     = 'enabled' === $GA_enabled && ! $was_enabled;
+	$secret_changed = 'enabled' === $GA_enabled && $was_enabled && $GA_secret !== $old_secret;
+	if ( $turning_on || $secret_changed ) {
+		$code     = isset( $_POST['GA_otp_code'] ) && is_string( $_POST['GA_otp_code'] ) ? $this->normalize_otp( sanitize_text_field( wp_unslash( $_POST['GA_otp_code'] ) ) ) : '';
+		$timeslot = '' !== $code ? $this->verify( $GA_secret, $code, $GA_relaxedmode, '' ) : false;
+		if ( $timeslot ) {
+			// Don't let the same code be used again to log in.
+			update_user_option( $user_id, 'googleauthenticator_lasttimeslot', $timeslot, true );
+		} elseif ( $turning_on ) {
+			// Leave it off. The (new) secret is still saved, so the QR code the user scanned stays valid.
+			$GA_enabled          = 'disabled';
+			$this->profile_error = 'not_enabled';
+		} else {
+			// Keep the secret that works with the user's app.
+			$GA_secret           = $old_secret;
+			$this->profile_error = 'secret_not_changed';
+		}
+	}
+
 	// Only store password if a new one has been generated. An empty field (no password created yet)
 	// or the "XXXX XXXX XXXX XXXX" placeholder (keep existing) must never be hashed and stored,
 	// otherwise an empty app password would be accepted over XML-RPC (CVE-2026-88759).
