@@ -9,7 +9,7 @@ Two-factor authentication for WordPress using Google Authenticator or any other 
 | Requires WordPress | 4.5 or later |
 | Tested up to | WordPress 7.2 |
 | Requires PHP | 7.2 or later (tested up to 8.6) |
-| Stable version | 0.58 |
+| Stable version | 0.59 |
 | License | [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html) |
 
 Install it from [WordPress.org](https://wordpress.org/plugins/google-authenticator/).
@@ -112,6 +112,14 @@ Yes. The replay protection isn't compatible with the test/setup mode of the "Sto
 
 ## Changelog
 
+### 0.59
+* Turning on Google Authenticator from the profile page, or saving a new secret while it is on, now needs a code from your authenticator app, so a mistake when adding the site to the app can no longer lock you out. Administrators can still turn it on for other users without a code.
+* On multisite, the network settings can now require 2FA for all Super Admins, including those with no role on a site.
+* Codes copied from an authenticator app are now accepted with any separator between the digits, such as "012 345", "012-345" or the no-break and thin spaces some apps and phones insert. Previously any space made a valid code fail.
+* New filters `google_authenticator_default_description` and `google_authenticator_hide_settings`, and "Hide settings from user" no longer hides the mandatory setup page.
+* Fixed the spelling of the "Successfully saved" settings messages, so they are now translated too.
+* Translations: the new strings are translated into all 24 languages. Like the rest, they are machine-assisted, so corrections from native speakers are welcome on translate.wordpress.org.
+
 ### 0.58
 * Security: Wrong verification codes are now rate limited. After 5 wrong codes sent with the correct password, further attempts are blocked for 1 minute, doubling up to 1 hour. Previously the 6 digit code could be brute-forced by anyone who knew the password.
 * Security: The verification code is only checked once the password is correct, and a wrong password and a wrong code now return the same error.
@@ -129,10 +137,6 @@ Yes. The replay protection isn't compatible with the test/setup mode of the "Sto
 * Login form: the cursor now starts in the username field, as on a normal WordPress login, instead of jumping to the code field. On the two-screen sign-in page it still starts in the code field.
 * Login form: a wrong code shakes the form, like a wrong password does.
 * Codes typed with full-width digits (for example with a Japanese input method) are now accepted in every browser.
-* Turning on Google Authenticator from the profile page, or saving a new secret while it is on, now needs a code from your authenticator app, so a mistake when adding the site to the app can no longer lock you out. Administrators can still turn it on for other users without a code.
-* New filters `google_authenticator_default_description` and `google_authenticator_hide_settings`, and "Hide settings from user" no longer hides the mandatory setup page.
-* On multisite, the network settings can now require 2FA for all Super Admins, including those with no role on a site.
-* Codes copied from an authenticator app are now accepted with any separator between the digits, such as "012 345", "012-345" or the no-break and thin spaces some apps and phones insert. Previously any space made a valid code fail.
 * Fixed the QR code for descriptions or site names with non-English characters. They were encoded incorrectly, so authenticator apps could show a garbled name or reject the code.
 * Fixed the setup page not sending users who already have two-factor authentication enabled back to the dashboard.
 * Updated the list of authenticator apps on the setup page (Google Authenticator, Microsoft Authenticator and Authy) and removed discontinued ones.
@@ -141,7 +145,6 @@ Yes. The replay protection isn't compatible with the test/setup mode of the "Sto
 * Code cleanup for the WordPress coding standards and Plugin Check: safe redirects, translator comments and text domains, current jQuery methods (no more jQuery Migrate warnings), and removal of obsolete code.
 * Updated the translation template.
 * Translations: added Arabic, Chinese (Taiwan), Czech, Hungarian, Indonesian, Japanese, Korean, Persian, Portuguese (Portugal), Russian, Spanish (Mexico), Turkish, Ukrainian and Vietnamese, and completed and corrected the existing ten languages. All 24 now cover every string. The new and corrected strings are machine-assisted, so corrections from native speakers are very welcome on translate.wordpress.org.
-* Fixed the spelling of the "Successfully saved" settings messages.
 * Tested with WordPress 7.2 and PHP 7.2 to 8.6.
 * Updated readme and FAQ.
 

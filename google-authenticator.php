@@ -4,7 +4,7 @@ Plugin Name: Google Authenticator
 Plugin URI: https://github.com/ivankruchkoff/google-authenticator
 Description: Two-factor authentication for WordPress using Google Authenticator or any other time-based (TOTP) authenticator app.
 Author: Ivan Kruchkoff
-Version: 0.58
+Version: 0.59
 Author URI: https://github.com/ivankruchkoff
 Requires at least: 4.5
 Requires PHP: 7.2
